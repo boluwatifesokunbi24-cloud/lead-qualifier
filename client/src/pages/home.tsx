@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
 import { ProgressStepper } from "@/components/ui/progress-stepper";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { parseCsvFile } from "@/lib/csv-utils";
 import { processLeads, exportToCSV } from "@/lib/lead-processor";
 import type { BusinessSetup, Lead, ProcessedLead, ProcessingStats } from "@shared/schema";
@@ -537,60 +538,20 @@ export default function Home() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col space-y-3 w-full">
-                    <Label className="text-sm font-medium text-charcoal-600">Score Ranges:</Label>
-                    <div className="flex flex-wrap gap-4">
-                      {[
+                  <div className="flex items-center space-x-2 w-full sm:w-auto">
+                    <Label className="text-sm font-medium text-charcoal-600 whitespace-nowrap">Score:</Label>
+                    <MultiSelect
+                      options={[
                         { value: "80-100", label: "80-100 (Excellent)", color: "text-green-600" },
                         { value: "60-79", label: "60-79 (Good)", color: "text-blue-600" },
                         { value: "40-59", label: "40-59 (Fair)", color: "text-amber-600" },
                         { value: "0-39", label: "0-39 (Poor)", color: "text-red-600" }
-                      ].map((range) => (
-                        <label key={range.value} className="flex items-center space-x-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4 text-navy-600 bg-gray-100 border-gray-300 rounded focus:ring-navy-500 focus:ring-2"
-                            checked={scoreFilter.includes(range.value)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setScoreFilter([...scoreFilter, range.value]);
-                              } else {
-                                setScoreFilter(scoreFilter.filter(f => f !== range.value));
-                              }
-                            }}
-                            data-testid={`checkbox-score-${range.value}`}
-                          />
-                          <span className={`text-sm font-medium ${range.color}`}>
-                            {range.label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                    {scoreFilter.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        <span className="text-xs text-gray-500">Selected:</span>
-                        {scoreFilter.map((range) => {
-                          const rangeInfo = [
-                            { value: "80-100", label: "Excellent" },
-                            { value: "60-79", label: "Good" },
-                            { value: "40-59", label: "Fair" },
-                            { value: "0-39", label: "Poor" }
-                          ].find(r => r.value === range);
-                          return (
-                            <span key={range} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-navy-100 text-navy-800">
-                              {range} ({rangeInfo?.label})
-                              <button
-                                onClick={() => setScoreFilter(scoreFilter.filter(f => f !== range))}
-                                className="ml-1 text-navy-600 hover:text-navy-800"
-                                data-testid={`remove-score-${range}`}
-                              >
-                                ×
-                              </button>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
+                      ]}
+                      value={scoreFilter}
+                      onChange={setScoreFilter}
+                      placeholder="Select score ranges..."
+                      className="w-full sm:w-[280px]"
+                    />
                   </div>
                   <UntitledButton
                     variant="tertiary"
