@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(211, 20%, 25%);
+  --card: hsl(220, 10%, 97%);
+  --card-foreground: hsl(211, 20%, 25%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(211, 20%, 25%);
+  --primary: hsl(221, 83%, 33%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(211, 20%, 25%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(210, 15%, 90%);
+  --muted-foreground: hsl(211, 20%, 25%);
+  --accent: hsl(213, 52%, 93%);
+  --accent-foreground: hsl(221, 83%, 33%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(220, 13%, 97%);
+  --ring: hsl(221, 83%, 33%);
+  --chart-1: hsl(221, 83%, 33%);
+  --chart-2: hsl(160, 100%, 36%);
+  --chart-3: hsl(43, 93%, 56%);
+  --chart-4: hsl(147, 79%, 42%);
+  --chart-5: hsl(341, 75%, 51%);
+  
+  /* Custom colors for Lead Qualifier */
+  --navy-600: hsl(221, 83%, 33%);
+  --navy-700: hsl(221, 83%, 27%);
+  --amber-500: hsl(43, 93%, 56%);
+  --forest-600: hsl(158, 64%, 20%);
+  --charcoal-600: hsl(211, 20%, 25%);
+  
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+  --radius: 0.75rem;
+  --shadow-2xs: 0px 1px 2px 0px hsl(0, 0%, 0%, 0.05);
+  --shadow-xs: 0px 1px 3px 0px hsl(0, 0%, 0%, 0.1), 0px 1px 2px 0px hsl(0, 0%, 0%, 0.06);
+  --shadow-sm: 0px 1px 3px 0px hsl(0, 0%, 0%, 0.1), 0px 1px 2px 0px hsl(0, 0%, 0%, 0.06);
+  --shadow: 0px 1px 3px 0px hsl(0, 0%, 0%, 0.1), 0px 1px 2px 0px hsl(0, 0%, 0%, 0.06);
+  --shadow-md: 0px 4px 6px -1px hsl(0, 0%, 0%, 0.1), 0px 2px 4px -1px hsl(0, 0%, 0%, 0.06);
+  --shadow-lg: 0px 10px 15px -3px hsl(0, 0%, 0%, 0.1), 0px 4px 6px -2px hsl(0, 0%, 0%, 0.05);
+  --shadow-xl: 0px 20px 25px -5px hsl(0, 0%, 0%, 0.1), 0px 10px 10px -5px hsl(0, 0%, 0%, 0.04);
+  --shadow-2xl: 0px 25px 50px -12px hsl(0, 0%, 0%, 0.25);
+}
+
+.dark {
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(210, 40%, 98%);
+  --card: hsl(222, 84%, 4.9%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --popover: hsl(222, 84%, 4.9%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(222, 84%, 4.9%);
+  --secondary: hsl(217, 32%, 17%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --muted: hsl(217, 32%, 17%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --accent: hsl(217, 32%, 17%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 62%, 30%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --border: hsl(217, 32%, 17%);
+  --input: hsl(217, 32%, 17%);
+  --ring: hsl(212, 72%, 59%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Custom utility classes for Lead Qualifier */
+.navy-600 {
+  color: var(--navy-600);
+}
+
+.bg-navy-600 {
+  background-color: var(--navy-600);
+}
+
+.bg-navy-700 {
+  background-color: var(--navy-700);
+}
+
+.text-amber-500 {
+  color: var(--amber-500);
+}
+
+.bg-amber-500 {
+  background-color: var(--amber-500);
+}
+
+.text-forest-600 {
+  color: var(--forest-600);
+}
+
+.bg-forest-600 {
+  background-color: var(--forest-600);
+}
+
+.text-charcoal-600 {
+  color: var(--charcoal-600);
+}
+
+.border-navy-600 {
+  border-color: var(--navy-600);
+}
+
+.ring-navy-200 {
+  --tw-ring-color: hsl(221, 83%, 90%);
+}
+
+.ring-navy-600 {
+  --tw-ring-color: var(--navy-600);
+}
+
+.focus\:ring-navy-600:focus {
+  --tw-ring-color: var(--navy-600);
+}
+
+.hover\:bg-navy-700:hover {
+  background-color: var(--navy-700);
+}
+
+.hover\:bg-navy-50:hover {
+  background-color: hsl(221, 83%, 97%);
+}
+
+.focus\:ring-4:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
