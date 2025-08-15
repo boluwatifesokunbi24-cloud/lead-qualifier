@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
-import { ProgressIndicator } from "@/components/ui/progress-indicator";
 import { parseCsvFile } from "@/lib/csv-utils";
 import { processLeads, exportToCSV } from "@/lib/lead-processor";
 import type { BusinessSetup, Lead, ProcessedLead, ProcessingStats } from "@shared/schema";
@@ -183,10 +182,6 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        {/* Progress Indicator */}
-        <div className="mb-6 sm:mb-8">
-          <ProgressIndicator currentStep={currentStep} />
-        </div>
 
         {/* Step 1: Business Setup */}
         {currentStep === 1 && (
