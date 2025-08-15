@@ -238,11 +238,13 @@ export default function Home() {
                 <div className="flex justify-center sm:justify-end pt-6 sm:pt-4">
                   <UntitledButton 
                     onClick={proceedToStep2}
-                    className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
+                    variant="primary"
+                    size="lg"
+                    className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto"
                     data-testid="button-continue-to-upload"
+                    iconTrailing={<ArrowRight className="w-5 h-5" />}
                   >
                     Continue to Upload
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                   </UntitledButton>
                 </div>
               </div>
@@ -281,20 +283,23 @@ export default function Home() {
                 <UntitledButton
                   variant="secondary"
                   onClick={() => setCurrentStep(1)}
-                  className="px-6 sm:px-6 py-3 sm:py-3 w-full sm:w-auto"
+                  size="lg"
+                  className="w-full sm:w-auto"
                   data-testid="button-back-to-step1"
+                  iconLeading={<ArrowLeft className="w-5 h-5" />}
                 >
-                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Back
                 </UntitledButton>
                 <UntitledButton
                   onClick={startProcessing}
                   disabled={!uploadedFile || rawLeads.length === 0}
-                  className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
+                  variant="primary"
+                  size="lg"
+                  className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto"
                   data-testid="button-start-processing"
+                  iconTrailing={<Zap className="w-5 h-5" />}
                 >
                   Start AI Analysis
-                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                 </UntitledButton>
               </div>
             </UntitledCardContent>
@@ -434,20 +439,23 @@ export default function Home() {
                   <div className="mt-6 sm:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                     <UntitledButton
                       onClick={() => exportResults(false)}
-                      className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto py-3 sm:py-2"
+                      variant="primary"
+                      size="md"
+                      className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto"
                       data-testid="button-export-all"
+                      iconLeading={<Download01 className="w-4 h-4" />}
                     >
-                      <Download01 className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Export All Results</span>
                       <span className="sm:hidden">Export All</span>
                     </UntitledButton>
                     <UntitledButton
                       variant="secondary"
                       onClick={() => exportResults(true)}
-                      className="w-full sm:w-auto py-3 sm:py-2"
+                      size="md"
+                      className="w-full sm:w-auto"
                       data-testid="button-export-filtered"
+                      iconLeading={<FilterLines className="w-4 h-4" />}
                     >
-                      <FilterLines className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Export Filtered ({filteredLeads.length})</span>
                       <span className="sm:hidden">Filtered ({filteredLeads.length})</span>
                     </UntitledButton>
@@ -492,7 +500,8 @@ export default function Home() {
                       setStatusFilter("all");
                       setScoreFilter("all");
                     }}
-                    className="text-navy-600 hover:text-navy-700 w-full sm:w-auto text-sm"
+                    size="sm"
+                    className="text-navy-600 hover:text-navy-700 w-full sm:w-auto"
                     data-testid="button-clear-filters"
                   >
                     Clear Filters
@@ -581,10 +590,10 @@ export default function Home() {
                   </div>
                   {filteredLeads.length > 20 && (
                     <div className="flex space-x-3 sm:space-x-2">
-                      <UntitledButton variant="secondary" disabled size="sm" className="text-xs px-4 py-2 sm:px-3">
+                      <UntitledButton variant="secondary" disabled size="sm" className="w-20">
                         Previous
                       </UntitledButton>
-                      <UntitledButton variant="secondary" size="sm" className="text-xs px-4 py-2 sm:px-3">
+                      <UntitledButton variant="secondary" size="sm" className="w-20">
                         Next
                       </UntitledButton>
                     </div>
@@ -598,10 +607,11 @@ export default function Home() {
               <UntitledButton
                 variant="secondary"
                 onClick={startNewAnalysis}
-                className="border-2 border-navy-600 text-navy-600 hover:bg-navy-50 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
+                size="lg"
+                className="border-2 border-navy-600 text-navy-600 hover:bg-navy-50 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto"
                 data-testid="button-start-new-analysis"
+                iconLeading={<RefreshCw05 className="w-5 h-5" />}
               >
-                <RefreshCw05 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Start New Analysis
               </UntitledButton>
             </div>

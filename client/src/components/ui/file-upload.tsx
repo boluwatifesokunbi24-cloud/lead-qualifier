@@ -76,7 +76,7 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
             type="button"
             variant="secondary"
             size="lg"
-            className="px-8 py-3 w-full sm:w-auto"
+            className="w-full sm:w-auto"
             data-testid="button-choose-file"
           >
             Choose File
