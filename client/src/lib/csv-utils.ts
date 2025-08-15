@@ -147,23 +147,15 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
             continue;
           }
 
-          // Set reasonable defaults
+          // Set reasonable defaults without adding "company" suffix
           if (!lead.companyName && lead.email) {
-            lead.companyName = lead.email.split('@')[1] || `Company ${i}`;
+            lead.companyName = lead.email.split('@')[1] || `Business ${i}`;
           }
           if (!lead.companyName && lead.contactName) {
-            lead.companyName = `${lead.contactName}'s Company`;
+            lead.companyName = lead.contactName;
           }
           if (!lead.companyName) {
-            lead.companyName = `Company ${i}`;
-          }
-          
-          if (!lead.email && lead.companyName) {
-            const cleanCompanyName = lead.companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
-            lead.email = `contact@${cleanCompanyName}.com`;
-          }
-          if (!lead.email) {
-            lead.email = `lead${i}@example.com`;
+            lead.companyName = `Business ${i}`;
           }
 
           leads.push(lead as Lead);

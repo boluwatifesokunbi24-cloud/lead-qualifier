@@ -22,26 +22,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Missing lead or business setup data' });
       }
 
-      // Prepare lead data for AI analysis
+      // Prepare lead data for AI analysis - only include available data
       const leadInfo = {
-        companyName: lead.companyName || 'Unknown',
-        email: lead.email || 'Not provided',
-        phone: lead.phone || 'Not provided',
-        industry: lead.industry || 'Not specified',
-        companySize: lead.companySize || 'Not specified',
-        title: lead.title || 'Not specified',
-        contactName: lead.contactName || 'Not provided',
-        website: lead.website || 'Not provided',
-        revenue: lead.revenue || 'Not specified',
+        companyName: lead.companyName,
+        email: lead.email,
+        phone: lead.phone,
+        industry: lead.industry,
+        companySize: lead.companySize,
+        title: lead.title,
+        contactName: lead.contactName,
+        website: lead.website,
+        revenue: lead.revenue,
         additionalData: lead.additionalData || {}
       };
+
+      // Build contact info string with only available data
+      const contactParts = [];
+      if (leadInfo.phone) contactParts.push(`Phone: ${leadInfo.phone}`);
+      if (leadInfo.email) contactParts.push(`Email: ${leadInfo.email}`);
+      const contactInfo = contactParts.length > 0 ? contactParts.join(' | ') : 'No contact info';
 
       const prompt = `Analyze this lead and respond with JSON only.
 
 Business: ${businessSetup.businessDescription}
 Goals: ${businessSetup.campaignGoals}
 
-Lead: ${leadInfo.contactName} | Company: ${leadInfo.companyName} | Location: ${leadInfo.additionalData?.['What local govt area do you stay'] || 'N/A'} | Status: ${leadInfo.additionalData?.['Call comments'] || 'N/A'}
+Lead: ${leadInfo.contactName || 'Unknown'} | Company: ${leadInfo.companyName || 'Unknown'} | ${contactInfo} | Location: ${leadInfo.additionalData?.['What local govt area do you stay'] || 'N/A'} | Status: ${leadInfo.additionalData?.['Call comments'] || 'N/A'}
 
 Return this exact JSON structure:
 {"score": number, "qualified": boolean, "reasoning": "brief explanation", "qualificationCriteria": ["key factors"]}`;
