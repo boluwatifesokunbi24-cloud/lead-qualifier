@@ -72,7 +72,7 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [scoreFilter, setScoreFilter] = useState<string>("all");
+  const [scoreFilter, setScoreFilter] = useState<string[]>([]);
   
   const { toast } = useToast();
 
@@ -161,7 +161,7 @@ export default function Home() {
     setIsProcessing(false);
     setProcessingProgress(0);
     setStatusFilter("all");
-    setScoreFilter("all");
+    setScoreFilter([]);
   }, []);
 
   const getFilteredLeads = useCallback(() => {
@@ -170,10 +170,13 @@ export default function Home() {
       if (statusFilter === "qualified" && !lead.qualified) return false;
       if (statusFilter === "not-qualified" && lead.qualified) return false;
       
-      // Score filter
-      if (scoreFilter !== "all") {
-        const [min, max] = scoreFilter.split("-").map(Number);
-        if (lead.score < min || lead.score > max) return false;
+      // Score filter - check if lead score falls within any of the selected ranges
+      if (scoreFilter.length > 0) {
+        const isInRange = scoreFilter.some(range => {
+          const [min, max] = range.split("-").map(Number);
+          return lead.score >= min && lead.score <= max;
+        });
+        if (!isInRange) return false;
       }
       
       return true;
@@ -534,26 +537,66 @@ export default function Home() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center space-x-2 w-full sm:w-auto">
-                    <Label className="text-sm font-medium text-charcoal-600 whitespace-nowrap">Score:</Label>
-                    <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                      <SelectTrigger className="w-full sm:w-[180px]" data-testid="select-score-filter">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Scores</SelectItem>
-                        <SelectItem value="80-100">80-100 (Excellent)</SelectItem>
-                        <SelectItem value="60-79">60-79 (Good)</SelectItem>
-                        <SelectItem value="40-59">40-59 (Fair)</SelectItem>
-                        <SelectItem value="0-39">0-39 (Poor)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="flex flex-col space-y-3 w-full">
+                    <Label className="text-sm font-medium text-charcoal-600">Score Ranges:</Label>
+                    <div className="flex flex-wrap gap-4">
+                      {[
+                        { value: "80-100", label: "80-100 (Excellent)", color: "text-green-600" },
+                        { value: "60-79", label: "60-79 (Good)", color: "text-blue-600" },
+                        { value: "40-59", label: "40-59 (Fair)", color: "text-amber-600" },
+                        { value: "0-39", label: "0-39 (Poor)", color: "text-red-600" }
+                      ].map((range) => (
+                        <label key={range.value} className="flex items-center space-x-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4 text-navy-600 bg-gray-100 border-gray-300 rounded focus:ring-navy-500 focus:ring-2"
+                            checked={scoreFilter.includes(range.value)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setScoreFilter([...scoreFilter, range.value]);
+                              } else {
+                                setScoreFilter(scoreFilter.filter(f => f !== range.value));
+                              }
+                            }}
+                            data-testid={`checkbox-score-${range.value}`}
+                          />
+                          <span className={`text-sm font-medium ${range.color}`}>
+                            {range.label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                    {scoreFilter.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <span className="text-xs text-gray-500">Selected:</span>
+                        {scoreFilter.map((range) => {
+                          const rangeInfo = [
+                            { value: "80-100", label: "Excellent" },
+                            { value: "60-79", label: "Good" },
+                            { value: "40-59", label: "Fair" },
+                            { value: "0-39", label: "Poor" }
+                          ].find(r => r.value === range);
+                          return (
+                            <span key={range} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-navy-100 text-navy-800">
+                              {range} ({rangeInfo?.label})
+                              <button
+                                onClick={() => setScoreFilter(scoreFilter.filter(f => f !== range))}
+                                className="ml-1 text-navy-600 hover:text-navy-800"
+                                data-testid={`remove-score-${range}`}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                   <UntitledButton
                     variant="tertiary"
                     onClick={() => {
                       setStatusFilter("all");
-                      setScoreFilter("all");
+                      setScoreFilter([]);
                     }}
                     size="sm"
                     className="text-navy-600 hover:text-navy-700 w-full sm:w-auto"
