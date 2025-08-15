@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
+import { ProgressStepper } from "@/components/ui/progress-stepper";
 import { parseCsvFile } from "@/lib/csv-utils";
 import { processLeads, exportToCSV } from "@/lib/lead-processor";
 import type { BusinessSetup, Lead, ProcessedLead, ProcessingStats } from "@shared/schema";
@@ -23,13 +24,43 @@ import {
   ArrowLeft,
   Download01,
   FilterLines,
-  RefreshCw05
+  RefreshCw05,
+  Upload01,
+  Settings01
 } from "@untitledui/icons";
 
 type Step = 1 | 2 | 3 | 4;
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState<Step>(1);
+  
+  // Define stepper steps
+  const stepperSteps = [
+    {
+      id: 1,
+      title: "Setup",
+      description: "Business details",
+      icon: <Settings01 className="w-5 h-5 sm:w-6 sm:h-6" />
+    },
+    {
+      id: 2,
+      title: "Upload",
+      description: "CSV file",
+      icon: <Upload01 className="w-5 h-5 sm:w-6 sm:h-6" />
+    },
+    {
+      id: 3,
+      title: "Process",
+      description: "AI analysis",
+      icon: <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
+    },
+    {
+      id: 4,
+      title: "Results",
+      description: "Qualified leads",
+      icon: <BarChart03 className="w-5 h-5 sm:w-6 sm:h-6" />
+    }
+  ];
   const [businessSetup, setBusinessSetup] = useState<BusinessSetup>({
     businessDescription: "",
     campaignGoals: ""
@@ -160,6 +191,21 @@ export default function Home() {
   }, [processedLeads, getFilteredLeads, toast]);
 
   const filteredLeads = getFilteredLeads();
+  
+  // Calculate completed steps
+  const getCompletedSteps = () => {
+    const completed = [];
+    if (businessSetup.businessDescription && businessSetup.campaignGoals) {
+      completed.push(1);
+    }
+    if (uploadedFile && rawLeads.length > 0) {
+      completed.push(2);
+    }
+    if (processedLeads.length > 0) {
+      completed.push(3);
+    }
+    return completed;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 font-inter">
@@ -188,6 +234,15 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        
+        {/* Progress Stepper */}
+        <div className="mb-8">
+          <ProgressStepper
+            steps={stepperSteps}
+            currentStep={currentStep}
+            completedSteps={getCompletedSteps()}
+          />
+        </div>
 
         {/* Step 1: Business Setup */}
         {currentStep === 1 && (
