@@ -54,16 +54,16 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
     <div className="space-y-4">
       {!uploadedFile ? (
         <div
-          className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-navy-600 transition-colors duration-200 cursor-pointer"
+          className="border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 text-center hover:border-navy-600 transition-colors duration-200 cursor-pointer"
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={triggerFileSelect}
           data-testid="area-file-upload"
         >
-          <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-lg font-medium text-charcoal-600 mb-2">Drop your CSV file here</p>
-          <p className="text-gray-600 mb-4">or click to browse from your computer</p>
+          <CloudArrowUpIcon className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-base sm:text-lg font-medium text-charcoal-600 mb-2">Drop your CSV file here</p>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">or click to browse</p>
           <input
             ref={fileInputRef}
             type="file"
@@ -75,7 +75,7 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
           <Button
             type="button"
             variant="outline"
-            className="px-6 py-3"
+            className="px-8 py-3 w-full sm:w-auto"
             data-testid="button-choose-file"
           >
             Choose File

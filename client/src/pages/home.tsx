@@ -199,21 +199,21 @@ export default function Home() {
             </CardHeader>
             <CardContent className="p-4 sm:p-6 lg:p-8">
               
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-6 sm:space-y-8">
                 <div>
                   <Label htmlFor="business-description" className="text-sm font-medium text-charcoal-600">
                     Business Description
                   </Label>
                   <Textarea
                     id="business-description"
-                    placeholder="Describe your business, products/services, target market, and ideal customer profile. The more detail you provide, the better our AI can qualify your leads."
-                    className="mt-2 min-h-[120px] resize-none focus:ring-navy-600 focus:border-navy-600"
+                    placeholder="Describe your business, products, and ideal customers..."
+                    className="mt-3 min-h-[100px] sm:min-h-[120px] resize-none focus:ring-navy-600 focus:border-navy-600"
                     value={businessSetup.businessDescription}
                     onChange={(e) => setBusinessSetup(prev => ({ ...prev, businessDescription: e.target.value }))}
                     data-testid="input-business-description"
                   />
-                  <p className="mt-1 text-sm text-gray-500">
-                    Be specific about your industry, company size, and what makes a good customer for you.
+                  <p className="mt-2 text-xs sm:text-sm text-gray-500">
+                    Be specific about your industry and ideal customers.
                   </p>
                 </div>
 
@@ -223,21 +223,21 @@ export default function Home() {
                   </Label>
                   <Textarea
                     id="campaign-goals"
-                    placeholder="What are your goals for this lead qualification? What characteristics define a qualified lead for your business? Include budget ranges, company sizes, industries, or any specific requirements."
-                    className="mt-2 min-h-[120px] resize-none focus:ring-navy-600 focus:border-navy-600"
+                    placeholder="What makes a lead qualified for your business?"
+                    className="mt-3 min-h-[100px] sm:min-h-[120px] resize-none focus:ring-navy-600 focus:border-navy-600"
                     value={businessSetup.campaignGoals}
                     onChange={(e) => setBusinessSetup(prev => ({ ...prev, campaignGoals: e.target.value }))}
                     data-testid="input-campaign-goals"
                   />
-                  <p className="mt-1 text-sm text-gray-500">
-                    This helps our AI understand what makes a lead qualified vs. not qualified for your specific needs.
+                  <p className="mt-2 text-xs sm:text-sm text-gray-500">
+                    Include budget ranges, company sizes, or specific requirements.
                   </p>
                 </div>
 
-                <div className="flex justify-center sm:justify-end pt-4">
+                <div className="flex justify-center sm:justify-end pt-6 sm:pt-4">
                   <Button 
                     onClick={proceedToStep2}
-                    className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 px-6 sm:px-8 py-2 sm:py-3 w-full sm:w-auto"
+                    className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
                     data-testid="button-continue-to-upload"
                   >
                     Continue to Upload
@@ -260,12 +260,12 @@ export default function Home() {
             </CardHeader>
             <CardContent className="p-4 sm:p-6 lg:p-8">
 
-              <div className="mb-6">
-                <div className="flex items-center bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <CheckCircleIcon className="w-5 h-5 text-blue-600 mr-3" />
+              <div className="mb-6 sm:mb-8">
+                <div className="flex items-start sm:items-center bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-4">
+                  <CheckCircleIcon className="w-5 h-5 text-blue-600 mr-3 mt-0.5 sm:mt-0 flex-shrink-0" />
                   <div className="text-sm">
-                    <p className="text-blue-800 font-medium">File Requirements</p>
-                    <p className="text-blue-700">CSV format only • Maximum 10MB • Include headers for lead information</p>
+                    <p className="text-blue-800 font-medium mb-1">File Requirements</p>
+                    <p className="text-blue-700 text-xs sm:text-sm">CSV format • Max 10MB • Include headers</p>
                   </div>
                 </div>
               </div>
@@ -276,11 +276,11 @@ export default function Home() {
                 leadCount={rawLeads.length}
               />
 
-              <div className="flex flex-col sm:flex-row justify-between pt-6 space-y-3 sm:space-y-0">
+              <div className="flex flex-col sm:flex-row justify-between pt-8 sm:pt-6 space-y-4 sm:space-y-0">
                 <Button
                   variant="outline"
                   onClick={() => setCurrentStep(1)}
-                  className="px-4 sm:px-6 py-2 sm:py-3 w-full sm:w-auto"
+                  className="px-6 sm:px-6 py-3 sm:py-3 w-full sm:w-auto"
                   data-testid="button-back-to-step1"
                 >
                   <ArrowLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
@@ -289,7 +289,7 @@ export default function Home() {
                 <Button
                   onClick={startProcessing}
                   disabled={!uploadedFile || rawLeads.length === 0}
-                  className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 px-6 sm:px-8 py-2 sm:py-3 w-full sm:w-auto"
+                  className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
                   data-testid="button-start-processing"
                 >
                   Start AI Analysis
@@ -311,37 +311,37 @@ export default function Home() {
             </CardHeader>
             <CardContent className="p-4 sm:p-6 lg:p-8">
 
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                  <SparklesIcon className="w-8 h-8 text-navy-600 animate-spin" />
+              <div className="text-center py-8 sm:py-12">
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 rounded-full mb-4 sm:mb-6">
+                  <SparklesIcon className="w-7 h-7 sm:w-8 sm:h-8 text-navy-600 animate-spin" />
                 </div>
-                <h3 className="text-lg font-semibold text-charcoal-600 mb-2">Analyzing Leads...</h3>
-                <p className="text-gray-600 mb-6">AI is evaluating each lead based on your business criteria</p>
+                <h3 className="text-lg sm:text-xl font-semibold text-charcoal-600 mb-3 sm:mb-2">Analyzing Leads...</h3>
+                <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 px-4">AI is evaluating each lead based on your criteria</p>
                 
-                <div className="max-w-md mx-auto">
-                  <Progress value={processingProgress} className="h-2 mb-4" />
-                  <p className="text-sm text-gray-600">
+                <div className="max-w-md mx-auto px-4">
+                  <Progress value={processingProgress} className="h-2 sm:h-3 mb-3 sm:mb-4" />
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Processing {Math.floor((processingProgress / 100) * rawLeads.length)} of {rawLeads.length} leads
                   </p>
                 </div>
 
                 {processingStats && (
-                  <div className="grid grid-cols-3 gap-4 mt-8 max-w-lg mx-auto">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-600">Qualified</p>
-                      <p className="text-2xl font-bold text-forest-600" data-testid="text-qualified-count">
+                  <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8 max-w-lg mx-auto px-4">
+                    <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Qualified</p>
+                      <p className="text-lg sm:text-2xl font-bold text-forest-600" data-testid="text-qualified-count">
                         {processingStats.qualifiedLeads}
                       </p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-600">Not Qualified</p>
-                      <p className="text-2xl font-bold text-gray-600" data-testid="text-not-qualified-count">
+                    <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Not Qualified</p>
+                      <p className="text-lg sm:text-2xl font-bold text-gray-600" data-testid="text-not-qualified-count">
                         {processingStats.notQualifiedLeads}
                       </p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-600">Remaining</p>
-                      <p className="text-2xl font-bold text-amber-500" data-testid="text-remaining-count">
+                    <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Remaining</p>
+                      <p className="text-lg sm:text-2xl font-bold text-amber-500" data-testid="text-remaining-count">
                         {processingStats.totalLeads - processingStats.processedLeads}
                       </p>
                     </div>
@@ -354,9 +354,9 @@ export default function Home() {
 
         {/* Step 4: Results */}
         {currentStep === 4 && processingStats && (
-          <div className="space-y-6">
+          <div className="space-y-6 sm:space-y-8">
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 px-2 sm:px-0">
               <Card>
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
@@ -430,10 +430,10 @@ export default function Home() {
                     <CardTitle className="text-2xl font-semibold text-charcoal-600">Lead Qualification Results</CardTitle>
                     <p className="mt-1 text-gray-600">AI-powered analysis of your leads with detailed reasoning</p>
                   </div>
-                  <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                  <div className="mt-6 sm:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                     <Button
                       onClick={() => exportResults(false)}
-                      className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto text-sm"
+                      className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto py-3 sm:py-2"
                       data-testid="button-export-all"
                     >
                       <DocumentArrowDownIcon className="w-4 h-4 mr-2" />
@@ -443,7 +443,7 @@ export default function Home() {
                     <Button
                       variant="outline"
                       onClick={() => exportResults(true)}
-                      className="w-full sm:w-auto text-sm"
+                      className="w-full sm:w-auto py-3 sm:py-2"
                       data-testid="button-export-filtered"
                     >
                       <FunnelIcon className="w-4 h-4 mr-2" />
@@ -455,8 +455,8 @@ export default function Home() {
               </CardHeader>
 
               {/* Filters */}
-              <div className="px-4 sm:px-6 lg:px-8 py-4 bg-gray-50 border-b border-gray-200">
-                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+              <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-4 bg-gray-50 border-b border-gray-200">
+                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                   <div className="flex items-center space-x-2 w-full sm:w-auto">
                     <Label className="text-sm font-medium text-charcoal-600 whitespace-nowrap">Status:</Label>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -513,8 +513,8 @@ export default function Home() {
                   <TableBody>
                     {filteredLeads.slice(0, 20).map((lead) => (
                       <TableRow key={lead.id} className="hover:bg-gray-50 transition-colors" data-testid={`row-lead-${lead.id}`}>
-                        <TableCell className="py-3 sm:py-4 px-4 sm:px-6">
-                          <div>
+                        <TableCell className="py-4 sm:py-4 px-4 sm:px-6">
+                          <div className="space-y-1 sm:space-y-0.5">
                             <div className="text-sm font-medium text-charcoal-600 truncate">{lead.companyName}</div>
                             <div className="text-xs sm:text-sm text-gray-600 truncate">{lead.email}</div>
                             {(lead.industry || lead.companySize) && (
@@ -523,16 +523,16 @@ export default function Home() {
                               </div>
                             )}
                             {/* Show AI reasoning on mobile */}
-                            <div className="text-xs text-gray-500 mt-1 lg:hidden line-clamp-2">
+                            <div className="text-xs text-gray-500 mt-2 lg:hidden line-clamp-2 leading-relaxed">
                               {lead.reasoning}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="py-3 sm:py-4 px-2 sm:px-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center">
-                            <div className="w-12 sm:w-16 bg-gray-200 rounded-full h-1.5 sm:h-2 mb-1 sm:mb-0 sm:mr-3">
+                        <TableCell className="py-4 sm:py-4 px-3 sm:px-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0">
+                            <div className="w-16 sm:w-16 bg-gray-200 rounded-full h-2 sm:h-2 sm:mr-3">
                               <div 
-                                className={`h-1.5 sm:h-2 rounded-full ${
+                                className={`h-2 sm:h-2 rounded-full ${
                                   lead.score >= 80 ? 'bg-forest-600' :
                                   lead.score >= 60 ? 'bg-amber-500' :
                                   'bg-red-500'
@@ -540,24 +540,26 @@ export default function Home() {
                                 style={{ width: `${lead.score}%` }}
                               />
                             </div>
-                            <span className="text-xs sm:text-sm font-medium text-charcoal-600" data-testid={`text-score-${lead.id}`}>
+                            <span className="text-sm sm:text-sm font-medium text-charcoal-600" data-testid={`text-score-${lead.id}`}>
                               {lead.score}
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className="py-3 sm:py-4 px-2 sm:px-4">
-                          <Badge 
-                            variant={lead.qualified ? "default" : "destructive"}
-                            className={`text-xs ${
-                              lead.qualified ? 
-                              "bg-green-100 text-green-800 hover:bg-green-100" : 
-                              "bg-red-100 text-red-800 hover:bg-red-100"
-                            }`}
-                            data-testid={`badge-status-${lead.id}`}
-                          >
-                            <span className="hidden sm:inline">{lead.qualified ? "Qualified" : "Not Qualified"}</span>
-                            <span className="sm:hidden">{lead.qualified ? "✓" : "✗"}</span>
-                          </Badge>
+                        <TableCell className="py-4 sm:py-4 px-3 sm:px-4">
+                          <div className="flex justify-center sm:justify-start">
+                            <Badge 
+                              variant={lead.qualified ? "default" : "destructive"}
+                              className={`text-xs px-3 py-1 ${
+                                lead.qualified ? 
+                                "bg-green-100 text-green-800 hover:bg-green-100" : 
+                                "bg-red-100 text-red-800 hover:bg-red-100"
+                              }`}
+                              data-testid={`badge-status-${lead.id}`}
+                            >
+                              <span className="hidden sm:inline">{lead.qualified ? "Qualified" : "Not Qualified"}</span>
+                              <span className="sm:hidden">{lead.qualified ? "✓" : "✗"}</span>
+                            </Badge>
+                          </div>
                         </TableCell>
                         <TableCell className="py-3 sm:py-4 px-4 sm:px-6 hidden lg:table-cell">
                           <div className="text-sm text-gray-600 max-w-xs" data-testid={`text-reasoning-${lead.id}`}>
@@ -571,17 +573,17 @@ export default function Home() {
               </div>
 
               {/* Pagination */}
-              <div className="bg-white px-4 sm:px-6 lg:px-8 py-4 border-t border-gray-200">
-                <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
+              <div className="bg-white px-4 sm:px-6 lg:px-8 py-5 sm:py-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
                   <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
                     Showing 1 to {Math.min(20, filteredLeads.length)} of {filteredLeads.length} {statusFilter === "qualified" ? "qualified" : statusFilter === "not-qualified" ? "not qualified" : ""} leads
                   </div>
                   {filteredLeads.length > 20 && (
-                    <div className="flex space-x-2">
-                      <Button variant="outline" disabled size="sm" className="text-xs px-3">
+                    <div className="flex space-x-3 sm:space-x-2">
+                      <Button variant="outline" disabled size="sm" className="text-xs px-4 py-2 sm:px-3">
                         Previous
                       </Button>
-                      <Button variant="outline" size="sm" className="text-xs px-3">
+                      <Button variant="outline" size="sm" className="text-xs px-4 py-2 sm:px-3">
                         Next
                       </Button>
                     </div>
@@ -591,11 +593,11 @@ export default function Home() {
             </Card>
 
             {/* New Analysis Button */}
-            <div className="text-center pt-6">
+            <div className="text-center pt-8 sm:pt-6 px-4 sm:px-0">
               <Button
                 variant="outline"
                 onClick={startNewAnalysis}
-                className="border-2 border-navy-600 text-navy-600 hover:bg-navy-50 focus:ring-4 focus:ring-navy-200 px-6 sm:px-8 py-2 sm:py-3 w-full sm:w-auto"
+                className="border-2 border-navy-600 text-navy-600 hover:bg-navy-50 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
                 data-testid="button-start-new-analysis"
               >
                 <ArrowPathIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
