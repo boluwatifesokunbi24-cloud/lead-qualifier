@@ -1,0 +1,159 @@
+Lead Qualifier AI Agent - Replit Development Prompt
+Project Overview
+Create a Lead Qualifier AI Agent web application that helps businesses automatically qualify their leads using AI analysis. The system should analyze business descriptions and campaign goals to intelligently score and categorize leads from CSV uploads.
+Core Functionality Requirements
+1. User Flow
+Step 1: Business describes their company and what will be their lead in natural language
+Step 2: User uploads CSV file with lead data (max 10MB)
+Step 3: AI processes leads automatically in background
+Step 4: Display results with filtering and export options
+2. Key Features
+Dynamic AI Qualification: AI generates qualification criteria based on business description and the goal
+Score-based Results: Each lead gets 0-100 score and percentage
+Binary Classification: Qualified/Not Qualified status (no hot/warm/cold categories)
+AI Reasoning: Detailed explanation for each lead's qualification
+Smart Filtering: Filter by status and score ranges
+CSV Export: Export all results or filtered subsets
+3. Technical Specifications
+Platform: Replit web application
+File Handling: CSV upload with 10MB limit
+No Data Storage: Client-side only, no backend database
+No Authentication: Simple, direct access
+Processing: Simulate AI analysis (can integrate real AI APIs later)
+UI/UX Design Requirements
+Design Philosophy: Trust-Centered Business Interface
+Primary Goal: Create an interface that immediately communicates reliability, professionalism, and competence to business users.
+Visual Design Principles
+Color Palette
+Primary: Deep navy blue (#1e3a8a) - conveys trust, stability, professionalism
+Secondary: Clean white (#ffffff) - represents clarity and transparency
+Accent: Subtle gold/amber (#f59e0b) - suggests premium quality and success
+Success: Forest green (#065f46) - indicates positive results
+Warning: Warm orange (#ea580c) - for important notifications
+Text: Charcoal gray (#374151) - ensures excellent readability
+Typography
+Use professional, readable fonts like Inter, Open Sans, or system fonts
+Clear hierarchy with proper font weights and sizes
+Generous line spacing for easy scanning
+Sans-serif fonts throughout for modern, clean appearance
+Layout Principles
+Generous Whitespace: Don't crowd elements - breathing room builds trust
+Consistent Spacing: Use 8px grid system for perfect alignment
+Clear Visual Hierarchy: Guide users naturally through the process
+Professional Cards: Use subtle shadows and rounded corners sparingly
+Clean Lines: Minimal borders, focus on content organization
+Trust-Building Elements
+1. Professional Header
+Clean logo area with professional tagline
+Subtle background pattern or gradient (not overwhelming)
+Clear value proposition: "Intelligent Lead Qualification for Growing Businesses"
+2. Progress Indicators
+Clear step indicators showing user's position in the process
+Professional progress bars with smooth animations
+Completion checkmarks for confidence building
+3. Data Security Messaging
+Prominent "No Data Stored" badge/message
+"Secure Processing" indicators where relevant
+Privacy-focused copy throughout
+4. Professional Form Design
+Clean, well-labeled form fields
+Helpful placeholder text that guides without overwhelming
+Subtle focus states and validation feedback
+Professional file upload area with clear instructions
+5. Results Presentation
+Clean, scannable data tables
+Professional status badges
+Clear metric cards with business-relevant KPIs
+Subtle data visualization elements
+Emotional Design Elements
+Confidence Building
+Consistent Branding: Same colors, fonts, spacing throughout
+Professional Icons: Use established icon libraries (Heroicons, Feather)
+Smooth Interactions: Subtle hover effects and transitions
+Loading States: Professional spinners and progress indicators
+Transparency
+Clear Labeling: Every action and result clearly explained
+Process Visibility: Show what's happening at each step
+No Hidden Costs: Clear, upfront about free usage
+Open Results: All qualification reasoning visible
+Competence
+Smart Defaults: Reasonable default values and selections
+Intelligent Validation: Helpful error messages and guidance
+Professional Copy: Business-appropriate language throughout
+Efficient Workflow: Minimal clicks to achieve goals
+Specific UI Components
+Business Description Form
+Clean, professional form with:
+- Large, comfortable text areas
+- Helpful labels: "Tell us about your business" and "What are your campaign goals?"
+- Character counts if needed
+- Professional "Continue" button
+
+File Upload
+Professional drag-and-drop area:
+- Subtle dashed border
+- Clear file requirements (CSV, 10MB max)
+- Upload progress indicator
+- File validation feedback
+
+Results Dashboard
+Business-focused layout:
+- KPI cards at top (Total Leads, Qualified %, etc.)
+- Professional data table with clean styling
+- Subtle row hover effects
+- Clear action buttons for filtering and export
+
+Export Controls
+Professional button group:
+- Primary "Export All Results" button
+- Secondary "Export Filtered" with count indicator
+- Subtle icons for visual hierarchy
+
+Copy and Messaging
+Tone of Voice
+Professional but Approachable: Business-appropriate without being stuffy
+Confident: Use definitive language about capabilities
+Helpful: Guide users clearly through each step
+Transparent: Be upfront about what the system does and doesn't do
+Key Messages
+"Intelligent lead qualification powered by AI"
+"No data stored - your information stays private"
+"Get qualification insights in minutes"
+"Export-ready results for your CRM"
+Technical Implementation Notes
+HTML Structure
+Semantic HTML5 elements
+Clean, logical component organization
+Accessibility considerations (ARIA labels, proper focus management)
+CSS Approach
+Modern CSS with custom properties for theming
+Responsive design using CSS Grid and Flexbox
+Smooth transitions and micro-interactions
+Professional shadow and border-radius values
+JavaScript Functionality
+Clean, modular code structure
+Proper error handling and user feedback
+Smooth animations and state transitions
+CSV parsing and export functionality
+File Structure for Replit
+index.html (main application file)
+├── HTML structure with semantic elements
+├── Embedded CSS with trust-focused styling
+├── JavaScript for all functionality
+└── Responsive design considerations
+
+Development Priorities
+Trust First: Every design decision should ask "Does this build trust?"
+Business Professional: Target business users, not consumer apps
+Functionality: Ensure all core features work smoothly
+Polish: Small details matter for professional perception
+Performance: Fast loading and smooth interactions
+Success Criteria
+The interface should make business users feel:
+Confident in the tool's capabilities
+Secure about their data privacy
+Efficient in completing their tasks
+Professional when using the system
+Trustful of the results provided
+This application should look and feel like a tool that serious businesses would confidently use for their lead qualification needs.
+
