@@ -198,14 +198,6 @@ export default function Home() {
               </p>
             </CardHeader>
             <CardContent className="p-8">
-              {/* Business meeting image placeholder */}
-              <div className="mb-8 rounded-lg overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=300"
-                  alt="Professional business meeting"
-                  className="w-full h-48 object-cover"
-                />
-              </div>
               
               <div className="space-y-6">
                 <div>
@@ -267,14 +259,6 @@ export default function Home() {
               </p>
             </CardHeader>
             <CardContent className="p-8">
-              {/* Business data analysis image placeholder */}
-              <div className="mb-8 rounded-lg overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=300"
-                  alt="Business data analysis dashboard"
-                  className="w-full h-48 object-cover"
-                />
-              </div>
 
               <div className="mb-6">
                 <div className="flex items-center bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -326,14 +310,6 @@ export default function Home() {
               </p>
             </CardHeader>
             <CardContent className="p-8">
-              {/* Professional office image placeholder */}
-              <div className="mb-8 rounded-lg overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=300"
-                  alt="Professional office environment with data analysis"
-                  className="w-full h-48 object-cover"
-                />
-              </div>
 
               <div className="text-center py-12">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
