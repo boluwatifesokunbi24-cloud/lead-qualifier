@@ -14,8 +14,8 @@ export async function processLeads(
   let qualifiedCount = 0;
   let totalScore = 0;
 
-  // Process leads in small batches to balance speed and API limits
-  const batchSize = 2; // Process 2 leads at a time
+  // Process leads in larger batches for maximum speed
+  const batchSize = 6; // Process 6 leads at a time
   
   for (let i = 0; i < leads.length; i += batchSize) {
     const batch = leads.slice(i, i + batchSize);
@@ -74,7 +74,7 @@ async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<Pr
   try {
     // Call backend API for AI analysis with timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
     const response = await fetch('/api/analyze-lead', {
       method: 'POST',

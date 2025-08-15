@@ -36,42 +36,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         additionalData: lead.additionalData || {}
       };
 
-      const prompt = `Analyze this lead against business criteria. Return JSON only.
+      const prompt = `Analyze this lead and respond with JSON only.
 
 Business: ${businessSetup.businessDescription}
 Goals: ${businessSetup.campaignGoals}
 
-Lead:
-- Company: ${leadInfo.companyName}
-- Industry: ${leadInfo.industry} 
-- Size: ${leadInfo.companySize}
-- Title: ${leadInfo.title}
-- Contact: ${leadInfo.contactName}
-- Location/Data: ${JSON.stringify(leadInfo.additionalData)}
+Lead: ${leadInfo.contactName} | Company: ${leadInfo.companyName} | Location: ${leadInfo.additionalData?.['What local govt area do you stay'] || 'N/A'} | Status: ${leadInfo.additionalData?.['Call comments'] || 'N/A'}
 
-Return:
-{
-  "score": <0-100>,
-  "qualified": <true/false>,
-  "reasoning": "<brief explanation>",
-  "qualificationCriteria": ["<key factors>"]
-}`;
+Return this exact JSON structure:
+{"score": number, "qualified": boolean, "reasoning": "brief explanation", "qualificationCriteria": ["key factors"]}`;
 
       const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo", // Using faster model for quick processing
         messages: [
           {
-            role: "system",
-            content: "You are a lead qualification analyst. Respond only with valid JSON in the exact format requested. Be concise."
-          },
-          {
             role: "user",
             content: prompt
           }
         ],
-        response_format: { type: "json_object" },
-        temperature: 0.5,
-        max_tokens: 300
+        // response_format: { type: "json_object" },
+        temperature: 0.8,
+        max_tokens: 100
       });
 
       const analysis = JSON.parse(response.choices[0].message.content || '{}');
