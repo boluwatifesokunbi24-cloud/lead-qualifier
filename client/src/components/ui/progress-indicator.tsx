@@ -13,12 +13,12 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
   ];
 
   return (
-    <div className="flex items-center justify-center space-x-8" data-testid="progress-indicator">
+    <div className="flex items-center justify-center space-x-2 sm:space-x-4 lg:space-x-8 px-4 overflow-x-auto" data-testid="progress-indicator">
       {steps.map((step, index) => (
-        <div key={step.number} className="flex items-center">
+        <div key={step.number} className="flex items-center flex-shrink-0">
           <div className="flex items-center" data-testid={`step-indicator-${step.number}`}>
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
                 step.number < currentStep
                   ? "bg-forest-600 text-white"
                   : step.number === currentStep
@@ -27,13 +27,13 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
               }`}
             >
               {step.number < currentStep ? (
-                <CheckIcon className="w-6 h-6" />
+                <CheckIcon className="w-4 h-4 sm:w-6 sm:h-6" />
               ) : (
-                step.number
+                <span className="text-sm sm:text-base">{step.number}</span>
               )}
             </div>
             <span
-              className={`ml-3 text-sm font-medium transition-colors duration-300 ${
+              className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium transition-colors duration-300 whitespace-nowrap ${
                 step.number < currentStep
                   ? "text-forest-600"
                   : step.number === currentStep
@@ -41,11 +41,16 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
                   : "text-gray-400"
               }`}
             >
-              {step.label}
+              <span className="hidden sm:inline">{step.label}</span>
+              <span className="sm:hidden">
+                {step.label === "Business Setup" ? "Setup" : 
+                 step.label === "Upload Data" ? "Upload" :
+                 step.label === "AI Processing" ? "Process" : "Results"}
+              </span>
             </span>
           </div>
           {index < steps.length - 1 && (
-            <div className="flex-1 h-1 bg-gray-200 mx-4">
+            <div className="w-4 sm:w-8 lg:w-12 h-0.5 sm:h-1 bg-gray-200 mx-2 sm:mx-4">
               <div
                 className={`h-full transition-all duration-500 ease-in-out ${
                   step.number < currentStep ? "bg-forest-600" : "bg-gray-200"
