@@ -13,18 +13,18 @@ import { parseCsvFile } from "@/lib/csv-utils";
 import { processLeads, exportToCSV } from "@/lib/lead-processor";
 import type { BusinessSetup, Lead, ProcessedLead, ProcessingStats } from "@shared/schema";
 import { 
-  ChartBarIcon, 
-  UsersIcon, 
-  CheckCircleIcon, 
-  ArrowTrendingUpIcon,
-  SparklesIcon,
-  ShieldCheckIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  DocumentArrowDownIcon,
-  FunnelIcon,
-  ArrowPathIcon
-} from "@heroicons/react/24/outline";
+  BarChart03, 
+  Users01, 
+  CheckCircle, 
+  TrendUp01,
+  Zap,
+  Shield01,
+  ArrowRight,
+  ArrowLeft,
+  Download01,
+  FilterLines,
+  RefreshCw05
+} from "@untitledui/icons";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -93,7 +93,13 @@ export default function Home() {
       const results = await processLeads(
         rawLeads, 
         businessSetup, 
-        (progress: number) => setProcessingProgress(progress)
+(progress) => {
+          if (typeof progress === 'number') {
+            setProcessingProgress(progress);
+          } else {
+            setProcessingProgress((progress.processed / progress.total) * 100);
+          }
+        }
       );
       
       setProcessedLeads(results.leads);
@@ -163,7 +169,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 sm:py-6 space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3 sm:space-x-4">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-navy-600 rounded-lg flex items-center justify-center">
-                <ChartBarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <BarChart03 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
                 <h1 className="text-lg sm:text-xl font-semibold text-charcoal-600">Lead Qualifier AI</h1>
@@ -172,7 +178,7 @@ export default function Home() {
             </div>
             <div className="flex items-center">
               <Badge variant="secondary" className="flex items-center bg-green-50 text-green-800 text-xs sm:text-sm">
-                <ShieldCheckIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <Shield01 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 No Data Stored
               </Badge>
             </div>
@@ -236,7 +242,7 @@ export default function Home() {
                     data-testid="button-continue-to-upload"
                   >
                     Continue to Upload
-                    <ArrowRightIcon className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                   </Button>
                 </div>
               </div>
@@ -257,7 +263,7 @@ export default function Home() {
 
               <div className="mb-6 sm:mb-8">
                 <div className="flex items-start sm:items-center bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-4">
-                  <CheckCircleIcon className="w-5 h-5 text-blue-600 mr-3 mt-0.5 sm:mt-0 flex-shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-blue-600 mr-3 mt-0.5 sm:mt-0 flex-shrink-0" />
                   <div className="text-sm">
                     <p className="text-blue-800 font-medium mb-1">File Requirements</p>
                     <p className="text-blue-700 text-xs sm:text-sm">CSV format • Max 10MB • Include headers</p>
@@ -278,7 +284,7 @@ export default function Home() {
                   className="px-6 sm:px-6 py-3 sm:py-3 w-full sm:w-auto"
                   data-testid="button-back-to-step1"
                 >
-                  <ArrowLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Back
                 </Button>
                 <Button
@@ -288,7 +294,7 @@ export default function Home() {
                   data-testid="button-start-processing"
                 >
                   Start AI Analysis
-                  <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                 </Button>
               </div>
             </CardContent>
@@ -308,7 +314,7 @@ export default function Home() {
 
               <div className="text-center py-8 sm:py-12">
                 <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 rounded-full mb-4 sm:mb-6">
-                  <SparklesIcon className="w-7 h-7 sm:w-8 sm:h-8 text-navy-600 animate-spin" />
+                  <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-navy-600 animate-spin" />
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-charcoal-600 mb-3 sm:mb-2">Analyzing Leads...</h3>
                 <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 px-4">AI is evaluating each lead based on your criteria</p>
@@ -356,7 +362,7 @@ export default function Home() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <UsersIcon className="w-6 h-6 sm:w-8 sm:h-8 text-navy-600" />
+                      <Users01 className="w-6 h-6 sm:w-8 sm:h-8 text-navy-600" />
                     </div>
                     <div className="ml-3 sm:ml-4">
                       <p className="text-xs sm:text-sm font-medium text-gray-600">Total Leads</p>
@@ -372,7 +378,7 @@ export default function Home() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <CheckCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 text-forest-600" />
+                      <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-forest-600" />
                     </div>
                     <div className="ml-3 sm:ml-4">
                       <p className="text-xs sm:text-sm font-medium text-gray-600">Qualified Leads</p>
@@ -388,7 +394,7 @@ export default function Home() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <ArrowTrendingUpIcon className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
+                      <TrendUp01 className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
                     </div>
                     <div className="ml-3 sm:ml-4">
                       <p className="text-xs sm:text-sm font-medium text-gray-600">Qualification Rate</p>
@@ -404,7 +410,7 @@ export default function Home() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <SparklesIcon className="w-6 h-6 sm:w-8 sm:h-8 text-navy-600" />
+                      <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-navy-600" />
                     </div>
                     <div className="ml-3 sm:ml-4">
                       <p className="text-xs sm:text-sm font-medium text-gray-600">Avg Score</p>
@@ -431,7 +437,7 @@ export default function Home() {
                       className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto py-3 sm:py-2"
                       data-testid="button-export-all"
                     >
-                      <DocumentArrowDownIcon className="w-4 h-4 mr-2" />
+                      <Download01 className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Export All Results</span>
                       <span className="sm:hidden">Export All</span>
                     </Button>
@@ -441,7 +447,7 @@ export default function Home() {
                       className="w-full sm:w-auto py-3 sm:py-2"
                       data-testid="button-export-filtered"
                     >
-                      <FunnelIcon className="w-4 h-4 mr-2" />
+                      <FilterLines className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Export Filtered ({filteredLeads.length})</span>
                       <span className="sm:hidden">Filtered ({filteredLeads.length})</span>
                     </Button>
@@ -595,7 +601,7 @@ export default function Home() {
                 className="border-2 border-navy-600 text-navy-600 hover:bg-navy-50 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
                 data-testid="button-start-new-analysis"
               >
-                <ArrowPathIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                <RefreshCw05 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Start New Analysis
               </Button>
             </div>

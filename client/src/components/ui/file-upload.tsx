@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { CloudArrowUpIcon, XMarkIcon, DocumentTextIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { Upload01, X, File02, CheckCircle } from "@untitledui/icons";
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
@@ -61,7 +61,7 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
           onClick={triggerFileSelect}
           data-testid="area-file-upload"
         >
-          <CloudArrowUpIcon className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
+          <Upload01 className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-base sm:text-lg font-medium text-charcoal-600 mb-2">Drop your CSV file here</p>
           <p className="text-sm sm:text-base text-gray-600 mb-6">or click to browse</p>
           <input
@@ -85,7 +85,7 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
         <div className="bg-gray-50 rounded-lg p-4" data-testid="preview-uploaded-file">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <CheckCircleIcon className="w-8 h-8 text-green-600 mr-3" />
+              <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
               <div>
                 <p className="font-medium text-charcoal-600" data-testid="text-file-name">
                   {uploadedFile.name}
@@ -103,7 +103,7 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
               className="text-gray-400 hover:text-gray-600"
               data-testid="button-remove-file"
             >
-              <XMarkIcon className="w-5 h-5" />
+              <X className="w-5 h-5" />
             </Button>
           </div>
         </div>
