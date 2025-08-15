@@ -147,18 +147,18 @@
 
 /* Placeholder text styling */
 ::placeholder {
-  color: #e4e7eb !important;
+  color: #9ba3af !important;
 }
 
 ::-webkit-input-placeholder {
-  color: #e4e7eb !important;
+  color: #9ba3af !important;
 }
 
 ::-moz-placeholder {
-  color: #e4e7eb !important;
+  color: #9ba3af !important;
   opacity: 1;
 }
 
 :-ms-input-placeholder {
-  color: #e4e7eb !important;
+  color: #9ba3af !important;
 }
