@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { UntitledCard, UntitledCardContent, UntitledCardHeader, UntitledCardTitle } from "@/components/ui/untitled-card";
+import { UntitledButton } from "@/components/ui/untitled-button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
+import { UntitledTextarea } from "@/components/ui/untitled-textarea";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -191,21 +191,21 @@ export default function Home() {
 
         {/* Step 1: Business Setup */}
         {currentStep === 1 && (
-          <Card className="overflow-hidden">
-            <CardHeader className="border-b border-gray-200 bg-white">
-              <CardTitle className="text-2xl font-semibold text-charcoal-600">Tell Us About Your Business</CardTitle>
+          <UntitledCard className="overflow-hidden">
+            <UntitledCardHeader className="border-b border-gray-200 bg-white">
+              <UntitledCardTitle className="text-2xl font-semibold text-charcoal-600">Tell Us About Your Business</UntitledCardTitle>
               <p className="mt-2 text-gray-600">
                 Help our AI understand your business and qualification criteria to provide the most accurate lead scoring.
               </p>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6 lg:p-8">
+            </UntitledCardHeader>
+            <UntitledCardContent className="p-4 sm:p-6 lg:p-8">
               
               <div className="space-y-6 sm:space-y-8">
                 <div>
                   <Label htmlFor="business-description" className="text-sm font-medium text-charcoal-600">
                     Business Description
                   </Label>
-                  <Textarea
+                  <UntitledTextarea
                     id="business-description"
                     placeholder="Describe your business, products, and ideal customers..."
                     className="mt-3 min-h-[100px] sm:min-h-[120px] resize-none focus:ring-navy-600 focus:border-navy-600"
@@ -222,7 +222,7 @@ export default function Home() {
                   <Label htmlFor="campaign-goals" className="text-sm font-medium text-charcoal-600">
                     Campaign Goals & Qualification Criteria
                   </Label>
-                  <Textarea
+                  <UntitledTextarea
                     id="campaign-goals"
                     placeholder="What makes a lead qualified for your business?"
                     className="mt-3 min-h-[100px] sm:min-h-[120px] resize-none focus:ring-navy-600 focus:border-navy-600"
@@ -236,30 +236,30 @@ export default function Home() {
                 </div>
 
                 <div className="flex justify-center sm:justify-end pt-6 sm:pt-4">
-                  <Button 
+                  <UntitledButton 
                     onClick={proceedToStep2}
                     className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
                     data-testid="button-continue-to-upload"
                   >
                     Continue to Upload
                     <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                  </Button>
+                  </UntitledButton>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </UntitledCardContent>
+          </UntitledCard>
         )}
 
         {/* Step 2: File Upload */}
         {currentStep === 2 && (
-          <Card className="overflow-hidden">
-            <CardHeader className="border-b border-gray-200 bg-white">
-              <CardTitle className="text-2xl font-semibold text-charcoal-600">Upload Your Lead Data</CardTitle>
+          <UntitledCard className="overflow-hidden">
+            <UntitledCardHeader className="border-b border-gray-200 bg-white">
+              <UntitledCardTitle className="text-2xl font-semibold text-charcoal-600">Upload Your Lead Data</UntitledCardTitle>
               <p className="mt-2 text-gray-600">
                 Upload your CSV file containing lead information. Our AI will analyze each lead based on your qualification criteria.
               </p>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6 lg:p-8">
+            </UntitledCardHeader>
+            <UntitledCardContent className="p-4 sm:p-6 lg:p-8">
 
               <div className="mb-6 sm:mb-8">
                 <div className="flex items-start sm:items-center bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-4">
@@ -278,16 +278,16 @@ export default function Home() {
               />
 
               <div className="flex flex-col sm:flex-row justify-between pt-8 sm:pt-6 space-y-4 sm:space-y-0">
-                <Button
-                  variant="outline"
+                <UntitledButton
+                  variant="secondary"
                   onClick={() => setCurrentStep(1)}
                   className="px-6 sm:px-6 py-3 sm:py-3 w-full sm:w-auto"
                   data-testid="button-back-to-step1"
                 >
                   <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Back
-                </Button>
-                <Button
+                </UntitledButton>
+                <UntitledButton
                   onClick={startProcessing}
                   disabled={!uploadedFile || rawLeads.length === 0}
                   className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
@@ -295,22 +295,22 @@ export default function Home() {
                 >
                   Start AI Analysis
                   <Zap className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                </Button>
+                </UntitledButton>
               </div>
-            </CardContent>
-          </Card>
+            </UntitledCardContent>
+          </UntitledCard>
         )}
 
         {/* Step 3: Processing */}
         {currentStep === 3 && (
-          <Card className="overflow-hidden">
-            <CardHeader className="border-b border-gray-200 bg-white">
-              <CardTitle className="text-2xl font-semibold text-charcoal-600">AI Processing Your Leads</CardTitle>
+          <UntitledCard className="overflow-hidden">
+            <UntitledCardHeader className="border-b border-gray-200 bg-white">
+              <UntitledCardTitle className="text-2xl font-semibold text-charcoal-600">AI Processing Your Leads</UntitledCardTitle>
               <p className="mt-2 text-gray-600">
                 Our AI is analyzing each lead against your qualification criteria. This usually takes 30-60 seconds.
               </p>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6 lg:p-8">
+            </UntitledCardHeader>
+            <UntitledCardContent className="p-4 sm:p-6 lg:p-8">
 
               <div className="text-center py-8 sm:py-12">
                 <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 rounded-full mb-4 sm:mb-6">
@@ -349,17 +349,17 @@ export default function Home() {
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </UntitledCardContent>
+          </UntitledCard>
         )}
 
         {/* Step 4: Results */}
         {currentStep === 4 && processingStats && (
           <div className="space-y-6 sm:space-y-8">
-            {/* KPI Cards */}
+            {/* KPI UntitledCards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 px-2 sm:px-0">
-              <Card>
-                <CardContent className="p-4 sm:p-6">
+              <UntitledCard>
+                <UntitledCardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <Users01 className="w-6 h-6 sm:w-8 sm:h-8 text-navy-600" />
@@ -371,11 +371,11 @@ export default function Home() {
                       </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </UntitledCardContent>
+              </UntitledCard>
 
-              <Card>
-                <CardContent className="p-4 sm:p-6">
+              <UntitledCard>
+                <UntitledCardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-forest-600" />
@@ -387,11 +387,11 @@ export default function Home() {
                       </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </UntitledCardContent>
+              </UntitledCard>
 
-              <Card>
-                <CardContent className="p-4 sm:p-6">
+              <UntitledCard>
+                <UntitledCardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <TrendUp01 className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
@@ -403,11 +403,11 @@ export default function Home() {
                       </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </UntitledCardContent>
+              </UntitledCard>
 
-              <Card>
-                <CardContent className="p-4 sm:p-6">
+              <UntitledCard>
+                <UntitledCardContent className="p-4 sm:p-6">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-navy-600" />
@@ -419,20 +419,20 @@ export default function Home() {
                       </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </UntitledCardContent>
+              </UntitledCard>
             </div>
 
             {/* Results Dashboard */}
-            <Card className="overflow-hidden">
-              <CardHeader className="border-b border-gray-200 bg-white">
+            <UntitledCard className="overflow-hidden">
+              <UntitledCardHeader className="border-b border-gray-200 bg-white">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <CardTitle className="text-2xl font-semibold text-charcoal-600">Lead Qualification Results</CardTitle>
+                    <UntitledCardTitle className="text-2xl font-semibold text-charcoal-600">Lead Qualification Results</UntitledCardTitle>
                     <p className="mt-1 text-gray-600">AI-powered analysis of your leads with detailed reasoning</p>
                   </div>
                   <div className="mt-6 sm:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
-                    <Button
+                    <UntitledButton
                       onClick={() => exportResults(false)}
                       className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto py-3 sm:py-2"
                       data-testid="button-export-all"
@@ -440,9 +440,9 @@ export default function Home() {
                       <Download01 className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Export All Results</span>
                       <span className="sm:hidden">Export All</span>
-                    </Button>
-                    <Button
-                      variant="outline"
+                    </UntitledButton>
+                    <UntitledButton
+                      variant="secondary"
                       onClick={() => exportResults(true)}
                       className="w-full sm:w-auto py-3 sm:py-2"
                       data-testid="button-export-filtered"
@@ -450,10 +450,10 @@ export default function Home() {
                       <FilterLines className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Export Filtered ({filteredLeads.length})</span>
                       <span className="sm:hidden">Filtered ({filteredLeads.length})</span>
-                    </Button>
+                    </UntitledButton>
                   </div>
                 </div>
-              </CardHeader>
+              </UntitledCardHeader>
 
               {/* Filters */}
               <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-4 bg-gray-50 border-b border-gray-200">
@@ -486,8 +486,8 @@ export default function Home() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button
-                    variant="ghost"
+                  <UntitledButton
+                    variant="tertiary"
                     onClick={() => {
                       setStatusFilter("all");
                       setScoreFilter("all");
@@ -496,7 +496,7 @@ export default function Home() {
                     data-testid="button-clear-filters"
                   >
                     Clear Filters
-                  </Button>
+                  </UntitledButton>
                 </div>
               </div>
 
@@ -581,29 +581,29 @@ export default function Home() {
                   </div>
                   {filteredLeads.length > 20 && (
                     <div className="flex space-x-3 sm:space-x-2">
-                      <Button variant="outline" disabled size="sm" className="text-xs px-4 py-2 sm:px-3">
+                      <UntitledButton variant="secondary" disabled size="sm" className="text-xs px-4 py-2 sm:px-3">
                         Previous
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-xs px-4 py-2 sm:px-3">
+                      </UntitledButton>
+                      <UntitledButton variant="secondary" size="sm" className="text-xs px-4 py-2 sm:px-3">
                         Next
-                      </Button>
+                      </UntitledButton>
                     </div>
                   )}
                 </div>
               </div>
-            </Card>
+            </UntitledCard>
 
-            {/* New Analysis Button */}
+            {/* New Analysis UntitledButton */}
             <div className="text-center pt-8 sm:pt-6 px-4 sm:px-0">
-              <Button
-                variant="outline"
+              <UntitledButton
+                variant="secondary"
                 onClick={startNewAnalysis}
                 className="border-2 border-navy-600 text-navy-600 hover:bg-navy-50 focus:ring-4 focus:ring-navy-200 px-8 sm:px-8 py-3 sm:py-3 w-full sm:w-auto"
                 data-testid="button-start-new-analysis"
               >
                 <RefreshCw05 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Start New Analysis
-              </Button>
+              </UntitledButton>
             </div>
           </div>
         )}

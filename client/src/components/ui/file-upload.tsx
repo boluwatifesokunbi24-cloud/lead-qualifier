@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { UntitledButton } from "@/components/ui/untitled-button";
 import { Upload01, X, File02, CheckCircle } from "@untitledui/icons";
 
 interface FileUploadProps {
@@ -72,14 +72,15 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
             className="hidden"
             data-testid="input-file-upload"
           />
-          <Button
+          <UntitledButton
             type="button"
-            variant="outline"
+            variant="secondary"
+            size="lg"
             className="px-8 py-3 w-full sm:w-auto"
             data-testid="button-choose-file"
           >
             Choose File
-          </Button>
+          </UntitledButton>
         </div>
       ) : (
         <div className="bg-gray-50 rounded-lg p-4" data-testid="preview-uploaded-file">
@@ -96,15 +97,15 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
                 </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
+            <UntitledButton
+              variant="tertiary"
               size="sm"
               onClick={removeFile}
               className="text-gray-400 hover:text-gray-600"
               data-testid="button-remove-file"
+              iconLeading={<X className="w-5 h-5" />}
             >
-              <X className="w-5 h-5" />
-            </Button>
+            </UntitledButton>
           </div>
         </div>
       )}
