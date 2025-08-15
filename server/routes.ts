@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
@@ -12,6 +13,8 @@ const openai = new OpenAI({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Lead analysis endpoint
   app.post('/api/analyze-lead', async (req, res) => {
+    console.log('API endpoint hit:', req.method, req.path);
+    console.log('Request body:', req.body);
     try {
       const { lead, businessSetup }: { lead: Lead; businessSetup: BusinessSetup } = req.body;
       

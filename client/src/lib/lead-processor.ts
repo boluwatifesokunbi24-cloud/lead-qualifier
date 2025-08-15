@@ -14,13 +14,11 @@ export async function processLeads(
   let qualifiedCount = 0;
   let totalScore = 0;
 
-  // Process leads in batches to simulate real AI processing
-  const batchSize = Math.max(1, Math.floor(leads.length / 20)); // Process in ~20 steps
-  
-  for (let i = 0; i < leads.length; i += batchSize) {
-    const batch = leads.slice(i, i + batchSize);
+  // Process leads sequentially to avoid overwhelming OpenAI API
+  for (let i = 0; i < leads.length; i++) {
+    const lead = leads[i];
     
-    for (const lead of batch) {
+    try {
       const processedLead = await processLead(lead, businessSetup);
       processedLeads.push(processedLead);
       
@@ -28,13 +26,25 @@ export async function processLeads(
         qualifiedCount++;
       }
       totalScore += processedLead.score;
+      
+      // Update progress after each lead
+      const progress = Math.min(100, ((i + 1) / leads.length) * 100);
+      onProgress?.(progress);
+      
+    } catch (error) {
+      console.error(`Failed to process lead ${i + 1}:`, error);
+      
+      // Add fallback lead data on error
+      const fallbackLead: ProcessedLead = {
+        ...lead,
+        score: 45,
+        qualified: false,
+        reasoning: "AI analysis failed. Please try again later.",
+        qualificationCriteria: []
+      };
+      
+      processedLeads.push(fallbackLead);
     }
-    
-    const progress = Math.min(100, ((i + batchSize) / leads.length) * 100);
-    onProgress?.(progress);
-    
-    // Add realistic processing delay
-    await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 100));
   }
 
   const stats: ProcessingStats = {
@@ -51,14 +61,20 @@ export async function processLeads(
 
 async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<ProcessedLead> {
   try {
-    // Call backend API for AI analysis
+    // Call backend API for AI analysis with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
     const response = await fetch('/api/analyze-lead', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ lead, businessSetup })
+      body: JSON.stringify({ lead, businessSetup }),
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`API request failed: ${response.status}`);
