@@ -1,5 +1,28 @@
 import type { Lead } from "@shared/schema";
 
+// Helper function to properly parse CSV lines with quoted fields
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  result.push(current.trim());
+  return result;
+}
+
 export async function parseCsvFile(file: File): Promise<Lead[]> {
   return new Promise((resolve, reject) => {
     // Validate file type
@@ -26,7 +49,7 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
           return;
         }
 
-        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        const headers = parseCSVLine(lines[0]);
         const leads: Lead[] = [];
 
         // Map common header variations to standard fields
@@ -61,7 +84,7 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
         };
 
         for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+          const values = parseCSVLine(lines[i]);
           
           if (values.length !== headers.length) {
             console.warn(`Row ${i + 1} has ${values.length} values but expected ${headers.length}. Skipping.`);
@@ -73,7 +96,7 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
             additionalData: {}
           };
 
-          headers.forEach((header, index) => {
+          headers.forEach((header: string, index: number) => {
             const normalizedHeader = header.toLowerCase().replace(/\s+/g, '_');
             const standardField = headerMap[normalizedHeader] || normalizedHeader;
             const value = values[index];
@@ -116,15 +139,32 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
             }
           });
 
-          // Validate required fields
-          if (!lead.companyName && !lead.email) {
-            console.warn(`Row ${i + 1} missing both company name and email. Skipping.`);
+          // More flexible validation - require at least one key field
+          const hasMinimumData = lead.companyName || lead.email || lead.contactName || Object.keys(lead.additionalData || {}).length > 0;
+          
+          if (!hasMinimumData) {
+            console.warn(`Row ${i + 1} appears to be empty or missing all key fields. Skipping.`);
             continue;
           }
 
-          // Set defaults
-          if (!lead.companyName) lead.companyName = lead.email?.split('@')[1] || `Company ${i}`;
-          if (!lead.email) lead.email = `contact@${lead.companyName?.toLowerCase().replace(/\s+/g, '')}.com`;
+          // Set reasonable defaults
+          if (!lead.companyName && lead.email) {
+            lead.companyName = lead.email.split('@')[1] || `Company ${i}`;
+          }
+          if (!lead.companyName && lead.contactName) {
+            lead.companyName = `${lead.contactName}'s Company`;
+          }
+          if (!lead.companyName) {
+            lead.companyName = `Company ${i}`;
+          }
+          
+          if (!lead.email && lead.companyName) {
+            const cleanCompanyName = lead.companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
+            lead.email = `contact@${cleanCompanyName}.com`;
+          }
+          if (!lead.email) {
+            lead.email = `lead${i}@example.com`;
+          }
 
           leads.push(lead as Lead);
         }
