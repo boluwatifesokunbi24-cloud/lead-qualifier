@@ -13,13 +13,16 @@ const openai = new OpenAI({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Lead analysis endpoint
   app.post('/api/analyze-lead', async (req, res) => {
-    console.log('API endpoint hit:', req.method, req.path);
-    console.log('Request body:', req.body);
     try {
       const { lead, businessSetup }: { lead: Lead; businessSetup: BusinessSetup } = req.body;
       
       if (!lead || !businessSetup) {
         return res.status(400).json({ error: 'Missing lead or business setup data' });
+      }
+      
+      // Validate that we have minimum required data
+      if (!lead.id) {
+        return res.status(400).json({ error: 'Lead ID is required' });
       }
 
       // Prepare lead data for AI analysis - only include available data
@@ -53,16 +56,19 @@ Return this exact JSON structure:
 {"score": number, "qualified": boolean, "reasoning": "brief explanation", "qualificationCriteria": ["key factors"]}`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // Using faster model for quick processing
+        model: "gpt-3.5-turbo", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
+          {
+            role: "system",
+            content: "You are a lead qualification expert. Analyze leads quickly and return only valid JSON."
+          },
           {
             role: "user",
             content: prompt
           }
         ],
-        // response_format: { type: "json_object" },
-        temperature: 0.8,
-        max_tokens: 100
+        temperature: 0.7,
+        max_tokens: 120
       });
 
       const analysis = JSON.parse(response.choices[0].message.content || '{}');
@@ -85,26 +91,55 @@ Return this exact JSON structure:
     } catch (error) {
       console.error('Error analyzing lead:', error);
       
-      // Fallback scoring
-      const { lead } = req.body;
-      let fallbackScore = 50;
-      const fallbackCriteria: string[] = [];
-      
-      if (lead?.industry?.toLowerCase().includes('tech')) fallbackScore += 10;
-      if (lead?.companySize?.toLowerCase().includes('enterprise')) fallbackScore += 15;
-      if (lead?.title?.toLowerCase().includes('ceo') || lead?.title?.toLowerCase().includes('founder')) {
-        fallbackScore += 20;
-        fallbackCriteria.push('Executive contact');
+      // Enhanced fallback scoring with better error handling
+      try {
+        const { lead } = req.body;
+        if (!lead) {
+          return res.status(500).json({ 
+            error: 'Failed to process lead - no lead data available' 
+          });
+        }
+        
+        let fallbackScore = 50;
+        const fallbackCriteria: string[] = [];
+        
+        // Safe scoring with null checks
+        if (lead.industry && lead.industry.toLowerCase().includes('tech')) {
+          fallbackScore += 10;
+          fallbackCriteria.push('Tech industry');
+        }
+        if (lead.companySize && lead.companySize.toLowerCase().includes('enterprise')) {
+          fallbackScore += 15;
+          fallbackCriteria.push('Enterprise size');
+        }
+        if (lead.title && (lead.title.toLowerCase().includes('ceo') || lead.title.toLowerCase().includes('founder'))) {
+          fallbackScore += 20;
+          fallbackCriteria.push('Executive contact');
+        }
+        if (lead.phone || lead.email) {
+          fallbackScore += 5;
+          fallbackCriteria.push('Contact info available');
+        }
+        
+        const qualified = fallbackScore >= 60;
+        
+        res.json({
+          score: Math.max(0, Math.min(100, fallbackScore)),
+          qualified,
+          reasoning: "AI analysis temporarily unavailable. Score based on lead qualification rules.",
+          qualificationCriteria: fallbackCriteria
+        });
+        
+      } catch (fallbackError) {
+        console.error('Error in fallback scoring:', fallbackError);
+        res.status(500).json({ 
+          error: 'Failed to process lead analysis',
+          score: 25,
+          qualified: false,
+          reasoning: 'Processing error occurred. Please try again.',
+          qualificationCriteria: []
+        });
       }
-      
-      const qualified = fallbackScore >= 60;
-      
-      res.json({
-        score: Math.max(0, Math.min(100, fallbackScore)),
-        qualified,
-        reasoning: "AI analysis temporarily unavailable. Score based on basic qualification rules.",
-        qualificationCriteria: fallbackCriteria
-      });
     }
   });
 

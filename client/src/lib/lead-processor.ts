@@ -14,8 +14,8 @@ export async function processLeads(
   let qualifiedCount = 0;
   let totalScore = 0;
 
-  // Process leads in larger batches for maximum speed
-  const batchSize = 6; // Process 6 leads at a time
+  // Process leads in optimized batches for maximum speed and stability
+  const batchSize = 4; // Process 4 leads at a time for optimal balance
   
   for (let i = 0; i < leads.length; i += batchSize) {
     const batch = leads.slice(i, i + batchSize);
@@ -72,9 +72,14 @@ export async function processLeads(
 
 async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<ProcessedLead> {
   try {
+    // Validate input data
+    if (!lead.id) {
+      throw new Error('Lead ID is required');
+    }
+    
     // Call backend API for AI analysis with timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout for stability
     
     const response = await fetch('/api/analyze-lead', {
       method: 'POST',
@@ -88,43 +93,77 @@ async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<Pr
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`API request failed: ${response.status} - ${errorText}`);
     }
 
     const analysis = await response.json();
     
+    // Validate analysis response
+    if (typeof analysis.score !== 'number' || typeof analysis.qualified !== 'boolean') {
+      throw new Error('Invalid response format from AI analysis');
+    }
+    
     return {
       ...lead,
-      score: analysis.score,
+      score: Math.max(0, Math.min(100, Math.round(analysis.score))),
       qualified: analysis.qualified,
-      reasoning: analysis.reasoning,
-      qualificationCriteria: analysis.qualificationCriteria
+      reasoning: analysis.reasoning || 'AI analysis completed successfully.',
+      qualificationCriteria: Array.isArray(analysis.qualificationCriteria) ? analysis.qualificationCriteria : []
     };
 
   } catch (error) {
     console.error('Error processing lead with AI:', error);
     
-    // Fallback to basic rule-based scoring if API fails
-    let fallbackScore = 50;
+    // Enhanced fallback to basic rule-based scoring if API fails
+    let fallbackScore = 45;
     const fallbackCriteria: string[] = [];
     
-    // Basic scoring fallback
-    if (lead.industry?.toLowerCase().includes('tech')) fallbackScore += 10;
-    if (lead.companySize?.toLowerCase().includes('enterprise')) fallbackScore += 15;
-    if (lead.title?.toLowerCase().includes('ceo') || lead.title?.toLowerCase().includes('founder')) {
-      fallbackScore += 20;
-      fallbackCriteria.push('Executive contact');
+    try {
+      // Safe scoring with proper null checks
+      if (lead.industry && lead.industry.toLowerCase().includes('tech')) {
+        fallbackScore += 10;
+        fallbackCriteria.push('Tech industry');
+      }
+      if (lead.companySize && lead.companySize.toLowerCase().includes('enterprise')) {
+        fallbackScore += 15;
+        fallbackCriteria.push('Enterprise company');
+      }
+      if (lead.title && (lead.title.toLowerCase().includes('ceo') || lead.title.toLowerCase().includes('founder') || lead.title.toLowerCase().includes('director'))) {
+        fallbackScore += 20;
+        fallbackCriteria.push('Senior executive');
+      }
+      if (lead.phone || lead.email) {
+        fallbackScore += 10;
+        fallbackCriteria.push('Contact details available');
+      }
+      if (lead.contactName) {
+        fallbackScore += 5;
+        fallbackCriteria.push('Named contact');
+      }
+      
+      const qualified = fallbackScore >= 60;
+      
+      return {
+        ...lead,
+        score: Math.max(0, Math.min(100, fallbackScore)),
+        qualified,
+        reasoning: "AI temporarily unavailable. Using backup scoring system.",
+        qualificationCriteria: fallbackCriteria
+      };
+      
+    } catch (fallbackError) {
+      console.error('Error in fallback processing:', fallbackError);
+      
+      // Ultimate fallback
+      return {
+        ...lead,
+        score: 30,
+        qualified: false,
+        reasoning: "Processing error occurred. Lead requires manual review.",
+        qualificationCriteria: ['Manual review needed']
+      };
     }
-    
-    const qualified = fallbackScore >= 60;
-    
-    return {
-      ...lead,
-      score: Math.max(0, Math.min(100, fallbackScore)),
-      qualified,
-      reasoning: "AI analysis temporarily unavailable. Score based on basic qualification rules.",
-      qualificationCriteria: fallbackCriteria
-    };
   }
 }
 

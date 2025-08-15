@@ -7,8 +7,8 @@ export const businessSetupSchema = z.object({
 
 export const leadSchema = z.object({
   id: z.string(),
-  companyName: z.string(),
-  email: z.string().email(),
+  companyName: z.string().optional(),
+  email: z.string().optional(),
   phone: z.string().optional(),
   industry: z.string().optional(),
   companySize: z.string().optional(),

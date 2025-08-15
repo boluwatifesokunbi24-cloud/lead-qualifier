@@ -139,24 +139,25 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
             }
           });
 
-          // More flexible validation - require at least one key field
-          const hasMinimumData = lead.companyName || lead.email || lead.contactName || Object.keys(lead.additionalData || {}).length > 0;
+          // More flexible validation - require at least one identifiable field
+          const hasMinimumData = lead.companyName || lead.email || lead.contactName || lead.phone || Object.keys(lead.additionalData || {}).length > 0;
           
           if (!hasMinimumData) {
             console.warn(`Row ${i + 1} appears to be empty or missing all key fields. Skipping.`);
             continue;
           }
 
-          // Set reasonable defaults without adding "company" suffix
-          if (!lead.companyName && lead.email) {
-            lead.companyName = lead.email.split('@')[1] || `Business ${i}`;
+          // Set reasonable defaults without adding "company" suffix - but keep optional
+          if (!lead.companyName && lead.email && lead.email.includes('@')) {
+            const domain = lead.email.split('@')[1];
+            if (domain && !domain.includes('example.com')) {
+              lead.companyName = domain.replace('.com', '').replace('.', ' ');
+            }
           }
           if (!lead.companyName && lead.contactName) {
             lead.companyName = lead.contactName;
           }
-          if (!lead.companyName) {
-            lead.companyName = `Business ${i}`;
-          }
+          // Don't force company name if not available - leave it optional
 
           leads.push(lead as Lead);
         }
