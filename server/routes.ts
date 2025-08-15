@@ -36,47 +36,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         additionalData: lead.additionalData || {}
       };
 
-      const prompt = `You are an expert lead qualification analyst. Analyze the following lead against the business criteria and provide a detailed assessment.
+      const prompt = `Analyze this lead against business criteria. Return JSON only.
 
-**Business Information:**
-- Business Description: ${businessSetup.businessDescription}
-- Campaign Goals & Qualification Criteria: ${businessSetup.campaignGoals}
+Business: ${businessSetup.businessDescription}
+Goals: ${businessSetup.campaignGoals}
 
-**Lead Information:**
+Lead:
 - Company: ${leadInfo.companyName}
-- Industry: ${leadInfo.industry}
-- Company Size: ${leadInfo.companySize}
-- Contact Title: ${leadInfo.title}
-- Contact Name: ${leadInfo.contactName}
-- Email: ${leadInfo.email}
-- Phone: ${leadInfo.phone}
-- Website: ${leadInfo.website}
-- Revenue: ${leadInfo.revenue}
-- Additional Data: ${JSON.stringify(leadInfo.additionalData)}
+- Industry: ${leadInfo.industry} 
+- Size: ${leadInfo.companySize}
+- Title: ${leadInfo.title}
+- Contact: ${leadInfo.contactName}
+- Location/Data: ${JSON.stringify(leadInfo.additionalData)}
 
-Please provide your analysis in JSON format with the following structure:
+Return:
 {
-  "score": <number between 0-100>,
-  "qualified": <boolean>,
-  "reasoning": "<detailed explanation of why this lead is/isn't qualified>",
-  "qualificationCriteria": ["<criterion1>", "<criterion2>", ...]
-}
-
-Consider factors like:
-- Industry alignment with business goals
-- Company size and revenue potential
-- Contact title and decision-making authority
-- Email domain professionalism
-- Overall fit with the stated qualification criteria
-
-Provide a thorough but concise reasoning that explains the score.`;
+  "score": <0-100>,
+  "qualified": <true/false>,
+  "reasoning": "<brief explanation>",
+  "qualificationCriteria": ["<key factors>"]
+}`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "gpt-3.5-turbo", // Using faster model for quick processing
         messages: [
           {
             role: "system",
-            content: "You are an expert lead qualification analyst. Always respond with valid JSON in the exact format requested. Be thorough but concise in your analysis."
+            content: "You are a lead qualification analyst. Respond only with valid JSON in the exact format requested. Be concise."
           },
           {
             role: "user",
@@ -84,8 +70,8 @@ Provide a thorough but concise reasoning that explains the score.`;
           }
         ],
         response_format: { type: "json_object" },
-        temperature: 0.3,
-        max_tokens: 1000
+        temperature: 0.5,
+        max_tokens: 300
       });
 
       const analysis = JSON.parse(response.choices[0].message.content || '{}');

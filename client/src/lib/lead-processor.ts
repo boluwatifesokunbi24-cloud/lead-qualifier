@@ -14,37 +14,48 @@ export async function processLeads(
   let qualifiedCount = 0;
   let totalScore = 0;
 
-  // Process leads sequentially to avoid overwhelming OpenAI API
-  for (let i = 0; i < leads.length; i++) {
-    const lead = leads[i];
+  // Process leads in small batches to balance speed and API limits
+  const batchSize = 2; // Process 2 leads at a time
+  
+  for (let i = 0; i < leads.length; i += batchSize) {
+    const batch = leads.slice(i, i + batchSize);
     
-    try {
-      const processedLead = await processLead(lead, businessSetup);
-      processedLeads.push(processedLead);
+    // Process batch in parallel
+    const batchPromises = batch.map(async (lead, batchIndex) => {
+      try {
+        const processedLead = await processLead(lead, businessSetup);
+        return { success: true, lead: processedLead, index: i + batchIndex };
+      } catch (error) {
+        console.error(`Failed to process lead ${i + batchIndex + 1}:`, error);
+        
+        const fallbackLead: ProcessedLead = {
+          ...lead,
+          score: 45,
+          qualified: false,
+          reasoning: "AI analysis failed. Please try again later.",
+          qualificationCriteria: []
+        };
+        
+        return { success: false, lead: fallbackLead, index: i + batchIndex };
+      }
+    });
+    
+    // Wait for batch to complete
+    const batchResults = await Promise.all(batchPromises);
+    
+    // Add results and update stats
+    for (const result of batchResults) {
+      processedLeads.push(result.lead);
       
-      if (processedLead.qualified) {
+      if (result.lead.qualified) {
         qualifiedCount++;
       }
-      totalScore += processedLead.score;
-      
-      // Update progress after each lead
-      const progress = Math.min(100, ((i + 1) / leads.length) * 100);
-      onProgress?.(progress);
-      
-    } catch (error) {
-      console.error(`Failed to process lead ${i + 1}:`, error);
-      
-      // Add fallback lead data on error
-      const fallbackLead: ProcessedLead = {
-        ...lead,
-        score: 45,
-        qualified: false,
-        reasoning: "AI analysis failed. Please try again later.",
-        qualificationCriteria: []
-      };
-      
-      processedLeads.push(fallbackLead);
+      totalScore += result.lead.score;
     }
+    
+    // Update progress after each batch
+    const progress = Math.min(100, ((i + batchSize) / leads.length) * 100);
+    onProgress?.(progress);
   }
 
   const stats: ProcessingStats = {
@@ -63,7 +74,7 @@ async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<Pr
   try {
     // Call backend API for AI analysis with timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
     
     const response = await fetch('/api/analyze-lead', {
       method: 'POST',
