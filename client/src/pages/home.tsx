@@ -384,7 +384,7 @@ export default function Home() {
                 <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 px-4">AI is evaluating each lead based on your criteria</p>
                 
                 <div className="max-w-md mx-auto px-4">
-                  <Progress value={processingProgress} className="h-2 sm:h-3 mb-3 sm:mb-4" />
+                  <Progress value={processingProgress} className="h-2 sm:h-3 mb-3 sm:mb-4 bg-navy-100 [&>div]:bg-navy-600" />
                   <p className="text-xs sm:text-sm text-gray-600">
                     Processing {Math.floor((processingProgress / 100) * rawLeads.length)} of {rawLeads.length} leads
                   </p>
