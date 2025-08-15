@@ -23,18 +23,23 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
-export async function parseCsvFile(file: File): Promise<Lead[]> {
+export async function parseCsvFile(file: File, onProgress?: (progress: number) => void): Promise<Lead[]> {
   return new Promise((resolve, reject) => {
-    // Validate file type
+    // Enhanced file validation
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      reject(new Error('Please select a CSV file.'));
+      reject(new Error('Please select a CSV file (.csv extension required).'));
       return;
     }
 
-    // Validate file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      reject(new Error('File size must be less than 10MB.'));
+    // Increased file size limit for production (50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      reject(new Error('File size must be less than 50MB. For larger files, please split into smaller chunks.'));
       return;
+    }
+
+    // Warn about large files
+    if (file.size > 5 * 1024 * 1024) {
+      console.warn(`Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB). Processing may take some time.`);
     }
 
     const reader = new FileReader();
@@ -49,8 +54,14 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
           return;
         }
 
+        // Validate CSV size
+        if (lines.length > 10000) {
+          console.warn(`Large CSV detected with ${lines.length} rows. Consider processing in smaller batches for optimal performance.`);
+        }
+
         const headers = parseCSVLine(lines[0]);
         const leads: Lead[] = [];
+        let processedRows = 0;
 
         // Map common header variations to standard fields
         const headerMap: Record<string, string> = {
@@ -83,13 +94,21 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
           'sales': 'revenue'
         };
 
+        // Process rows with progress updates
         for (let i = 1; i < lines.length; i++) {
           const values = parseCSVLine(lines[i]);
+          
+          // Progress update for large files
+          if (lines.length > 1000 && i % 100 === 0) {
+            onProgress?.((i / lines.length) * 100);
+          }
           
           if (values.length !== headers.length) {
             console.warn(`Row ${i + 1} has ${values.length} values but expected ${headers.length}. Skipping.`);
             continue;
           }
+          
+          processedRows++;
 
           const lead: Partial<Lead> = {
             id: `lead_${i}`,
@@ -167,6 +186,12 @@ export async function parseCsvFile(file: File): Promise<Lead[]> {
           return;
         }
 
+        // Final progress update
+        onProgress?.(100);
+        
+        // Log processing results
+        console.log(`CSV processing complete: ${leads.length} leads extracted from ${processedRows} valid rows`);
+        
         resolve(leads);
       } catch (error) {
         reject(new Error(`Failed to parse CSV file: ${error instanceof Error ? error.message : 'Unknown error'}`));

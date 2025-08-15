@@ -4,25 +4,76 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
 import type { BusinessSetup, Lead } from "@shared/schema";
+import rateLimit from "express-rate-limit";
+import { z } from "zod";
+import { Logger } from "./index";
 
 // Initialize OpenAI client
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY
 });
 
+// Rate limiting for production
+const analysisLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // limit each IP to 100 requests per minute
+  message: {
+    error: 'Too many analysis requests. Please try again in a minute.',
+    retryAfter: 60
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Input validation schemas
+const leadAnalysisSchema = z.object({
+  lead: z.object({
+    id: z.string().min(1),
+    companyName: z.string().optional(),
+    email: z.string().optional(),
+    phone: z.string().optional(),
+    industry: z.string().optional(),
+    companySize: z.string().optional(),
+    title: z.string().optional(),
+    contactName: z.string().optional(),
+    website: z.string().optional(),
+    revenue: z.string().optional(),
+    additionalData: z.record(z.any()).optional(),
+  }),
+  businessSetup: z.object({
+    businessDescription: z.string().min(10).max(1000),
+    campaignGoals: z.string().min(10).max(1000),
+  })
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Lead analysis endpoint
-  app.post('/api/analyze-lead', async (req, res) => {
+  // Lead analysis endpoint with rate limiting
+  app.post('/api/analyze-lead', analysisLimiter, async (req, res) => {
+    const startTime = Date.now();
+    
     try {
-      const { lead, businessSetup }: { lead: Lead; businessSetup: BusinessSetup } = req.body;
+      // Validate input with detailed error messages
+      const validationResult = leadAnalysisSchema.safeParse(req.body);
       
-      if (!lead || !businessSetup) {
-        return res.status(400).json({ error: 'Missing lead or business setup data' });
+      if (!validationResult.success) {
+        console.warn('Invalid request data:', validationResult.error.format());
+        return res.status(400).json({ 
+          error: 'Invalid request data',
+          details: validationResult.error.issues.map(issue => ({
+            field: issue.path.join('.'),
+            message: issue.message
+          }))
+        });
       }
       
-      // Validate that we have minimum required data
-      if (!lead.id) {
-        return res.status(400).json({ error: 'Lead ID is required' });
+      const { lead, businessSetup } = validationResult.data;
+      
+      // Additional business validation
+      const hasContactInfo = lead.phone || lead.email || lead.contactName;
+      if (!hasContactInfo) {
+        return res.status(400).json({ 
+          error: 'Lead must have at least one contact method (phone, email, or contact name)' 
+        });
       }
 
       // Prepare lead data for AI analysis - only include available data
@@ -55,37 +106,90 @@ Lead: ${leadInfo.contactName || 'Unknown'} | Company: ${leadInfo.companyName || 
 Return this exact JSON structure:
 {"score": number, "qualified": boolean, "reasoning": "brief explanation", "qualificationCriteria": ["key factors"]}`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [
-          {
-            role: "system",
-            content: "You are a lead qualification expert. Analyze leads quickly and return only valid JSON."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 120
-      });
-
-      const analysis = JSON.parse(response.choices[0].message.content || '{}');
+      // AI analysis with timeout and retry logic
+      let response;
+      let attempts = 0;
+      const maxAttempts = 2;
       
-      // Validate and sanitize the response
-      const score = Math.max(0, Math.min(100, Math.round(analysis.score || 50)));
-      const qualified = analysis.qualified === true || score >= 60;
-      const reasoning = analysis.reasoning || "AI analysis completed but no detailed reasoning provided.";
+      while (attempts < maxAttempts) {
+        try {
+          response = await Promise.race([
+            openai.chat.completions.create({
+              model: "gpt-3.5-turbo", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+              messages: [
+                {
+                  role: "system",
+                  content: "You are a lead qualification expert. Analyze leads quickly and return only valid JSON."
+                },
+                {
+                  role: "user",
+                  content: prompt
+                }
+              ],
+              temperature: 0.7,
+              max_tokens: 120
+            }),
+            new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error('AI request timeout')), 10000)
+            )
+          ]) as any;
+          break; // Success, exit retry loop
+        } catch (error) {
+          attempts++;
+          console.warn(`AI request attempt ${attempts} failed:`, error);
+          if (attempts >= maxAttempts) {
+            throw error; // Final attempt failed
+          }
+          // Brief delay before retry
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      // Parse and validate AI response
+      let analysis;
+      try {
+        const content = response.choices[0]?.message?.content;
+        if (!content) {
+          throw new Error('Empty AI response');
+        }
+        analysis = JSON.parse(content);
+      } catch (parseError) {
+        console.error('Failed to parse AI response:', parseError);
+        throw new Error('Invalid AI response format');
+      }
+      
+      // Validate and sanitize the response with comprehensive checks
+      const score = typeof analysis.score === 'number' 
+        ? Math.max(0, Math.min(100, Math.round(analysis.score)))
+        : 50;
+      
+      const qualified = typeof analysis.qualified === 'boolean' 
+        ? analysis.qualified 
+        : score >= 60;
+        
+      const reasoning = typeof analysis.reasoning === 'string' && analysis.reasoning.trim()
+        ? analysis.reasoning.trim().substring(0, 500) // Limit reasoning length
+        : "AI analysis completed successfully.";
+        
       const qualificationCriteria = Array.isArray(analysis.qualificationCriteria) 
-        ? analysis.qualificationCriteria.slice(0, 5)
+        ? analysis.qualificationCriteria
+            .filter((c: any) => typeof c === 'string' && c.trim())
+            .slice(0, 5)
+            .map((c: string) => c.trim())
         : [];
 
+      const processingTime = Date.now() - startTime;
+      
+      // Log successful analysis for monitoring
+      console.log(`Lead ${lead.id} analyzed successfully in ${processingTime}ms - Score: ${score}, Qualified: ${qualified}`);
+      
       res.json({
+        success: true,
         score,
         qualified,
         reasoning,
-        qualificationCriteria
+        qualificationCriteria,
+        processingTime
       });
 
     } catch (error) {

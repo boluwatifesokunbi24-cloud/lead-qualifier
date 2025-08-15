@@ -1,66 +1,94 @@
-import { CheckIcon } from "@heroicons/react/24/solid";
+import { Progress } from "@/components/ui/progress";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 
-interface ProgressIndicatorProps {
-  currentStep: 1 | 2 | 3 | 4;
+interface ProcessingProgress {
+  processed: number;
+  total: number;
+  currentBatch: number;
+  totalBatches: number;
+  averageTimePerLead: number;
+  estimatedTimeRemaining: number;
+  errors: number;
+  retries: number;
 }
 
-export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
-  const steps = [
-    { number: 1, label: "Business Setup" },
-    { number: 2, label: "Upload Data" },
-    { number: 3, label: "AI Processing" },
-    { number: 4, label: "Results" }
-  ];
+interface ProgressIndicatorProps {
+  progress?: ProcessingProgress;
+  stage: 'parsing' | 'processing' | 'completed';
+  className?: string;
+}
+
+const defaultProgress: ProcessingProgress = {
+  processed: 0,
+  total: 100,
+  currentBatch: 0,
+  totalBatches: 0,
+  averageTimePerLead: 0,
+  estimatedTimeRemaining: 0,
+  errors: 0,
+  retries: 0
+};
+
+export function ProcessingProgressIndicator({ progress = defaultProgress, stage, className }: ProgressIndicatorProps) {
+  const safeProgress = { ...defaultProgress, ...progress };
+  const percentage = safeProgress.total > 0 ? Math.round((safeProgress.processed / safeProgress.total) * 100) : 0;
+  
+  const formatTime = (ms: number) => {
+    if (ms < 1000) return `${Math.round(ms)}ms`;
+    if (ms < 60000) return `${Math.round(ms / 1000)}s`;
+    return `${Math.round(ms / 60000)}m ${Math.round((ms % 60000) / 1000)}s`;
+  };
 
   return (
-    <div className="flex items-center justify-center space-x-2 sm:space-x-4 lg:space-x-8 px-4 overflow-x-auto" data-testid="progress-indicator">
-      {steps.map((step, index) => (
-        <div key={step.number} className="flex items-center flex-shrink-0">
-          <div className="flex items-center" data-testid={`step-indicator-${step.number}`}>
-            <div
-              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
-                step.number < currentStep
-                  ? "bg-forest-600 text-white"
-                  : step.number === currentStep
-                  ? "bg-navy-600 text-white"
-                  : "bg-gray-200 text-gray-400"
-              }`}
-            >
-              {step.number < currentStep ? (
-                <CheckIcon className="w-4 h-4 sm:w-6 sm:h-6" />
-              ) : (
-                <span className="text-sm sm:text-base">{step.number}</span>
-              )}
-            </div>
-            <span
-              className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium transition-colors duration-300 whitespace-nowrap ${
-                step.number < currentStep
-                  ? "text-forest-600"
-                  : step.number === currentStep
-                  ? "text-navy-600"
-                  : "text-gray-400"
-              }`}
-            >
-              <span className="hidden sm:inline">{step.label}</span>
-              <span className="sm:hidden">
-                {step.label === "Business Setup" ? "Setup" : 
-                 step.label === "Upload Data" ? "Upload" :
-                 step.label === "AI Processing" ? "Process" : "Results"}
-              </span>
+    <div className={cn("space-y-4 p-4 bg-white dark:bg-gray-800 rounded-lg border", className)} data-testid="progress-indicator">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Spinner size="sm" />
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {stage === 'parsing' ? 'Parsing CSV...' : 
+             stage === 'processing' ? 'Processing Leads...' : 'Complete!'}
+          </span>
+        </div>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {percentage}%
+        </span>
+      </div>
+
+      <Progress value={percentage} className="w-full" data-testid="progress-bar" />
+
+      <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
+        <div>
+          <span className="font-medium">Progress:</span> {safeProgress.processed}/{safeProgress.total} leads
+        </div>
+        <div>
+          <span className="font-medium">Batch:</span> {safeProgress.currentBatch}/{safeProgress.totalBatches}
+        </div>
+        <div>
+          <span className="font-medium">Avg Time:</span> {formatTime(safeProgress.averageTimePerLead)}
+        </div>
+        <div>
+          <span className="font-medium">Time Left:</span> {formatTime(safeProgress.estimatedTimeRemaining)}
+        </div>
+      </div>
+
+      {(safeProgress.errors > 0 || safeProgress.retries > 0) && (
+        <div className="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-gray-700">
+          {safeProgress.errors > 0 && (
+            <span className="text-amber-600 dark:text-amber-400" data-testid="error-count">
+              ⚠️ {safeProgress.errors} errors (using fallback)
             </span>
-          </div>
-          {index < steps.length - 1 && (
-            <div className="w-4 sm:w-8 lg:w-12 h-0.5 sm:h-1 bg-gray-200 mx-2 sm:mx-4">
-              <div
-                className={`h-full transition-all duration-500 ease-in-out ${
-                  step.number < currentStep ? "bg-forest-600" : "bg-gray-200"
-                }`}
-                style={{ width: step.number < currentStep ? "100%" : "0%" }}
-              />
-            </div>
+          )}
+          {safeProgress.retries > 0 && (
+            <span className="text-blue-600 dark:text-blue-400" data-testid="retry-count">
+              🔄 {safeProgress.retries} retries
+            </span>
           )}
         </div>
-      ))}
+      )}
     </div>
   );
 }
+
+// Keep backward compatibility
+export { ProcessingProgressIndicator as ProgressIndicator };

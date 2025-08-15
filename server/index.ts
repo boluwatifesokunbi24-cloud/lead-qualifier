@@ -2,6 +2,31 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Production logging utility
+class Logger {
+  static info(message: string, data?: any) {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] INFO: ${message}`, data || '');
+  }
+  
+  static warn(message: string, data?: any) {
+    const timestamp = new Date().toISOString();
+    console.warn(`[${timestamp}] WARN: ${message}`, data || '');
+  }
+  
+  static error(message: string, error?: any) {
+    const timestamp = new Date().toISOString();
+    console.error(`[${timestamp}] ERROR: ${message}`, error || '');
+  }
+  
+  static performance(operation: string, duration: number, data?: any) {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] PERF: ${operation} completed in ${duration}ms`, data || '');
+  }
+}
+
+export { Logger };
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -39,12 +64,29 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
+    
+    // Enhanced error logging for production
+    Logger.error(`Unhandled error on ${req.method} ${req.path}`, {
+      error: message,
+      stack: err.stack,
+      status,
+      userAgent: req.get('User-Agent'),
+      ip: req.ip
+    });
 
-    res.status(status).json({ message });
-    throw err;
+    res.status(status).json({ 
+      success: false,
+      error: process.env.NODE_ENV === 'production' ? 'Internal server error' : message,
+      requestId: Date.now().toString(36)
+    });
+    
+    // Don't throw in production to keep server running
+    if (process.env.NODE_ENV !== 'production') {
+      throw err;
+    }
   });
 
   // importantly only setup vite in development and after

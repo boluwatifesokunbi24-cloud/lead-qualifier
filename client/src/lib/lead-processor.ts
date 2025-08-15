@@ -5,38 +5,62 @@ interface ProcessingResult {
   stats: ProcessingStats;
 }
 
+interface ProcessingProgress {
+  processed: number;
+  total: number;
+  currentBatch: number;
+  totalBatches: number;
+  averageTimePerLead: number;
+  estimatedTimeRemaining: number;
+  errors: number;
+  retries: number;
+}
+
 export async function processLeads(
   leads: Lead[],
   businessSetup: BusinessSetup,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: ProcessingProgress | number) => void
 ): Promise<ProcessingResult> {
   const processedLeads: ProcessedLead[] = [];
   let qualifiedCount = 0;
   let totalScore = 0;
+  let totalErrors = 0;
+  let totalRetries = 0;
+  const processingTimes: number[] = [];
+  const startTime = Date.now();
 
   // Process leads in optimized batches for maximum speed and stability
   const batchSize = 4; // Process 4 leads at a time for optimal balance
+  const totalBatches = Math.ceil(leads.length / batchSize);
   
   for (let i = 0; i < leads.length; i += batchSize) {
     const batch = leads.slice(i, i + batchSize);
     
-    // Process batch in parallel
+    // Process batch in parallel with timing
+    const batchStartTime = Date.now();
     const batchPromises = batch.map(async (lead, batchIndex) => {
+      const leadStartTime = Date.now();
       try {
         const processedLead = await processLead(lead, businessSetup);
-        return { success: true, lead: processedLead, index: i + batchIndex };
+        const processingTime = Date.now() - leadStartTime;
+        processingTimes.push(processingTime);
+        return { success: true, lead: processedLead, index: i + batchIndex, processingTime };
       } catch (error) {
+        totalErrors++;
         console.error(`Failed to process lead ${i + batchIndex + 1}:`, error);
         
+        // Enhanced fallback with better error context
+        const processingTime = Date.now() - leadStartTime;
         const fallbackLead: ProcessedLead = {
           ...lead,
-          score: 45,
+          score: 35,
           qualified: false,
-          reasoning: "AI analysis failed. Please try again later.",
-          qualificationCriteria: []
+          reasoning: `Processing error: ${error instanceof Error ? error.message : 'Unknown error'}. Using fallback scoring.`,
+          qualificationCriteria: ['Requires manual review']
         };
         
-        return { success: false, lead: fallbackLead, index: i + batchIndex };
+        processingTimes.push(processingTime);
+        return { success: false, lead: fallbackLead, index: i + batchIndex, processingTime };
       }
     });
     
@@ -53,9 +77,28 @@ export async function processLeads(
       totalScore += result.lead.score;
     }
     
-    // Update progress after each batch
-    const progress = Math.min(100, ((i + batchSize) / leads.length) * 100);
-    onProgress?.(progress);
+    // Calculate detailed progress metrics
+    const processed = processedLeads.length;
+    const currentBatch = Math.floor(i / batchSize) + 1;
+    const averageTimePerLead = processingTimes.length > 0 
+      ? processingTimes.reduce((a, b) => a + b, 0) / processingTimes.length
+      : 0;
+    const estimatedTimeRemaining = averageTimePerLead * (leads.length - processed);
+    
+    // Update progress with comprehensive information
+    if (onProgress) {
+      const progressData = {
+        processed,
+        total: leads.length,
+        currentBatch,
+        totalBatches,
+        averageTimePerLead,
+        estimatedTimeRemaining,
+        errors: totalErrors,
+        retries: totalRetries
+      };
+      onProgress(progressData);
+    }
   }
 
   const stats: ProcessingStats = {
@@ -115,6 +158,31 @@ async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<Pr
   } catch (error) {
     console.error('Error processing lead with AI:', error);
     
+    // Enhanced fallback with retry logic for production
+    if (error instanceof Error && error.name === 'AbortError') {
+      // Timeout error - try once more with fallback
+      try {
+        const quickResponse = await fetch('/api/analyze-lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lead, businessSetup }),
+        });
+        
+        if (quickResponse.ok) {
+          const analysis = await quickResponse.json();
+          return {
+            ...lead,
+            score: Math.max(0, Math.min(100, Math.round(analysis.score || 50))),
+            qualified: analysis.qualified || false,
+            reasoning: analysis.reasoning || 'AI analysis completed on retry.',
+            qualificationCriteria: Array.isArray(analysis.qualificationCriteria) ? analysis.qualificationCriteria : []
+          };
+        }
+      } catch (retryError) {
+        console.warn('Retry failed, using fallback scoring:', retryError);
+      }
+    }
+    
     // Enhanced fallback to basic rule-based scoring if API fails
     let fallbackScore = 45;
     const fallbackCriteria: string[] = [];
@@ -148,20 +216,20 @@ async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<Pr
         ...lead,
         score: Math.max(0, Math.min(100, fallbackScore)),
         qualified,
-        reasoning: "AI temporarily unavailable. Using backup scoring system.",
+        reasoning: "AI temporarily unavailable. Using backup scoring system with enhanced reliability.",
         qualificationCriteria: fallbackCriteria
       };
       
     } catch (fallbackError) {
       console.error('Error in fallback processing:', fallbackError);
       
-      // Ultimate fallback
+      // Ultimate fallback with better user experience
       return {
         ...lead,
-        score: 30,
+        score: 35,
         qualified: false,
-        reasoning: "Processing error occurred. Lead requires manual review.",
-        qualificationCriteria: ['Manual review needed']
+        reasoning: "Technical issue occurred during processing. Lead has been preserved for manual review.",
+        qualificationCriteria: ['Manual review recommended', 'System fallback applied']
       };
     }
   }
@@ -201,6 +269,7 @@ export function exportToCSV(leads: ProcessedLead[], filename: string) {
     ].join(','))
   ].join('\n');
 
+  // Enhanced download with better file handling
   const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   
@@ -212,5 +281,19 @@ export function exportToCSV(leads: ProcessedLead[], filename: string) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
+    // Cleanup to prevent memory leaks
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    console.log(`Export completed: ${filename} with ${leads.length} leads`);
   }
+}
+
+// Export qualified leads only for production use
+export function exportQualifiedLeads(leads: ProcessedLead[], filename: string = 'qualified_leads.csv') {
+  const qualifiedLeads = leads.filter(lead => lead.qualified);
+  if (qualifiedLeads.length === 0) {
+    console.warn('No qualified leads to export');
+    return;
+  }
+  exportToCSV(qualifiedLeads, filename);
 }
