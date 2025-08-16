@@ -4,11 +4,12 @@ import { Upload01, X, File02, CheckCircle } from "@untitledui/icons";
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
+  onFileRemove?: () => void;
   uploadedFile: File | null;
   leadCount?: number;
 }
 
-export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUploadProps) {
+export function FileUpload({ onFileSelect, onFileRemove, uploadedFile, leadCount }: FileUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,9 +43,9 @@ export function FileUpload({ onFileSelect, uploadedFile, leadCount }: FileUpload
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-    // Note: We don't have a callback to notify parent of file removal
-    // This would need to be added to the parent component
-  }, []);
+    // Notify parent component about file removal
+    onFileRemove?.();
+  }, [onFileRemove]);
 
   const triggerFileSelect = useCallback(() => {
     fileInputRef.current?.click();

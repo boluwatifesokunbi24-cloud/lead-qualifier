@@ -110,6 +110,15 @@ export default function Home() {
     }
   }, [toast]);
 
+  const handleFileRemove = useCallback(() => {
+    setUploadedFile(null);
+    setRawLeads([]);
+    toast({
+      title: "File Removed",
+      description: "You can now upload a different CSV file."
+    });
+  }, [toast]);
+
   const startProcessing = useCallback(async () => {
     if (!uploadedFile || rawLeads.length === 0) {
       toast({
@@ -357,6 +366,7 @@ export default function Home() {
 
               <FileUpload
                 onFileSelect={handleFileSelect}
+                onFileRemove={handleFileRemove}
                 uploadedFile={uploadedFile}
                 leadCount={rawLeads.length}
               />
