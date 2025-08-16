@@ -13,16 +13,18 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Rate limiting for production
+// Rate limiting for production - more generous limits for lead processing
 const analysisLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 100, // limit each IP to 100 requests per minute
+  max: 200, // increased to 200 requests per minute for better throughput
   message: {
-    error: 'Too many analysis requests. Please try again in a minute.',
-    retryAfter: 60
+    error: 'Too many analysis requests. Please try again in a moment.',
+    retryAfter: 30
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Add skip condition for development
+  skip: (req) => process.env.NODE_ENV === 'development' && req.ip === '127.0.0.1'
 });
 
 // Input validation schemas
@@ -109,7 +111,7 @@ Return this exact JSON structure:
       // AI analysis with timeout and retry logic
       let response;
       let attempts = 0;
-      const maxAttempts = 2;
+      const maxAttempts = 3; // Increased retry attempts for better reliability
       
       while (attempts < maxAttempts) {
         try {

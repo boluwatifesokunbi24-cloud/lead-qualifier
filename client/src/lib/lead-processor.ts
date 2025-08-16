@@ -29,18 +29,28 @@ export async function processLeads(
   const processingTimes: number[] = [];
   const startTime = Date.now();
 
-  // Process leads in optimized batches for maximum speed and stability
-  const batchSize = 4; // Process 4 leads at a time for optimal balance
+  // Process leads in conservative batches to avoid rate limits
+  const batchSize = 2; // Process 2 leads at a time to stay within API limits
   const totalBatches = Math.ceil(leads.length / batchSize);
   
   for (let i = 0; i < leads.length; i += batchSize) {
     const batch = leads.slice(i, i + batchSize);
+    
+    // Add delay between batches to respect rate limits
+    if (i > 0) {
+      await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay between batches
+    }
     
     // Process batch in parallel with timing
     const batchStartTime = Date.now();
     const batchPromises = batch.map(async (lead, batchIndex) => {
       const leadStartTime = Date.now();
       try {
+        // Add small delay between individual requests within batch
+        if (batchIndex > 0) {
+          await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay between requests in batch
+        }
+        
         const processedLead = await processLead(lead, businessSetup);
         const processingTime = Date.now() - leadStartTime;
         processingTimes.push(processingTime);
@@ -137,6 +147,12 @@ async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<Pr
 
     if (!response.ok) {
       const errorText = await response.text();
+      
+      // Handle rate limiting specifically
+      if (response.status === 429) {
+        throw new Error('Rate limit reached. Processing will retry automatically...');
+      }
+      
       throw new Error(`API request failed: ${response.status} - ${errorText}`);
     }
 
