@@ -149,7 +149,7 @@ export function SurveyModal({
               {showPriceRange && (
                 <div className="space-y-3">
                   <Label className="text-sm font-medium text-charcoal-600">
-                    What's your preferred price range?
+                    What price range would you consider reasonable per 100 leads?
                   </Label>
                   <Select 
                     value={surveyData.priceRange} 
@@ -162,10 +162,10 @@ export function SurveyModal({
                       <SelectValue placeholder="Select price range..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="10-30">$10-30/month</SelectItem>
-                      <SelectItem value="31-60">$31-60/month</SelectItem>
-                      <SelectItem value="61-100">$61-100/month</SelectItem>
-                      <SelectItem value="100+">$100+/month</SelectItem>
+                      <SelectItem value="1-2">$1-2 per 100 leads</SelectItem>
+                      <SelectItem value="3-5">$3-5 per 100 leads</SelectItem>
+                      <SelectItem value="6-10">$6-10 per 100 leads</SelectItem>
+                      <SelectItem value="10+">$10+ per 100 leads</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
