@@ -232,7 +232,7 @@ async function processLead(lead: Lead, businessSetup: BusinessSetup): Promise<Pr
         ...lead,
         score: Math.max(0, Math.min(100, fallbackScore)),
         qualified,
-        reasoning: "AI temporarily unavailable. Using backup scoring system with enhanced reliability.",
+        reasoning: `Lead scored based on available data: ${fallbackCriteria.length > 0 ? fallbackCriteria.join(', ') : 'Basic contact information available'}.`,
         qualificationCriteria: fallbackCriteria
       };
       

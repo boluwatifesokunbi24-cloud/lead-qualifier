@@ -120,6 +120,16 @@ export default function Home() {
       return;
     }
 
+    // Validate business setup data
+    if (!businessSetup.businessDescription.trim() || !businessSetup.campaignGoals.trim()) {
+      toast({
+        title: "Missing Business Information",
+        description: "Please complete both business description and campaign goals before processing.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setCurrentStep(3);
     setIsProcessing(true);
     setProcessingProgress(0);

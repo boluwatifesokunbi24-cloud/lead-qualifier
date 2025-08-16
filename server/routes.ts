@@ -43,8 +43,8 @@ const leadAnalysisSchema = z.object({
     additionalData: z.record(z.any()).optional(),
   }),
   businessSetup: z.object({
-    businessDescription: z.string().min(10).max(1000),
-    campaignGoals: z.string().min(10).max(1000),
+    businessDescription: z.string().min(1).max(1000), // Reduced from 10 to 1 for flexibility
+    campaignGoals: z.string().min(1).max(1000), // Reduced from 10 to 1 for flexibility
   })
 });
 
@@ -59,6 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         console.warn('Invalid request data:', validationResult.error.format());
+        console.warn('Received data:', JSON.stringify(req.body, null, 2));
         return res.status(400).json({ 
           error: 'Invalid request data',
           details: validationResult.error.issues.map(issue => ({
