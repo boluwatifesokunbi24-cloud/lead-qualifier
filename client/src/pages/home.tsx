@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
 import { ProgressStepper } from "@/components/ui/progress-stepper";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { SurveyModal, type SurveyData } from "@/components/ui/survey-modal";
 import { parseCsvFile } from "@/lib/csv-utils";
 import { processLeads, exportToCSV } from "@/lib/lead-processor";
 import type { BusinessSetup, Lead, ProcessedLead, ProcessingStats } from "@shared/schema";
@@ -74,6 +75,8 @@ export default function Home() {
   const [processingProgress, setProcessingProgress] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [scoreFilter, setScoreFilter] = useState<string[]>([]);
+  const [surveyModalOpen, setSurveyModalOpen] = useState(false);
+  const [exportType, setExportType] = useState<'all' | 'filtered'>('all');
   
   const { toast } = useToast();
 
@@ -184,15 +187,25 @@ export default function Home() {
     });
   }, [processedLeads, statusFilter, scoreFilter]);
 
-  const exportResults = useCallback((filtered: boolean = false) => {
-    const leadsToExport = filtered ? getFilteredLeads() : processedLeads;
-    exportToCSV(leadsToExport, `lead_qualification_results_${filtered ? 'filtered_' : ''}${new Date().toISOString().split('T')[0]}.csv`);
+  const openSurveyModal = useCallback((filtered: boolean = false) => {
+    setExportType(filtered ? 'filtered' : 'all');
+    setSurveyModalOpen(true);
+  }, []);
+
+  const handleExportWithSurvey = useCallback((surveyData: SurveyData) => {
+    const leadsToExport = exportType === 'filtered' ? getFilteredLeads() : processedLeads;
+    const filename = `lead_qualification_results_${exportType === 'filtered' ? 'filtered_' : ''}${new Date().toISOString().split('T')[0]}.csv`;
+    
+    // Log survey data for analytics (in a real app, you'd send this to your analytics service)
+    console.log('Survey feedback:', surveyData);
+    
+    exportToCSV(leadsToExport, filename);
     
     toast({
       title: "Export Complete",
-      description: `Exported ${leadsToExport.length} leads to CSV file.`
+      description: `Exported ${leadsToExport.length} leads to CSV file. Thank you for your feedback!`
     });
-  }, [processedLeads, getFilteredLeads, toast]);
+  }, [exportType, processedLeads, getFilteredLeads, toast]);
 
   const filteredLeads = getFilteredLeads();
   
@@ -497,7 +510,7 @@ export default function Home() {
                   </div>
                   <div className="mt-6 sm:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                     <UntitledButton
-                      onClick={() => exportResults(false)}
+                      onClick={() => openSurveyModal(false)}
                       variant="primary"
                       size="md"
                       className="bg-navy-600 hover:bg-navy-700 focus:ring-4 focus:ring-navy-200 w-full sm:w-auto"
@@ -509,7 +522,7 @@ export default function Home() {
                     </UntitledButton>
                     <UntitledButton
                       variant="secondary"
-                      onClick={() => exportResults(true)}
+                      onClick={() => openSurveyModal(true)}
                       size="md"
                       className="w-full sm:w-auto"
                       data-testid="button-export-filtered"
@@ -677,6 +690,14 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Survey Modal */}
+      <SurveyModal
+        isOpen={surveyModalOpen}
+        onClose={() => setSurveyModalOpen(false)}
+        onExport={handleExportWithSurvey}
+        exportButtonText={exportType === 'filtered' ? `Export Filtered (${filteredLeads.length})` : "Export All Results"}
+      />
     </div>
   );
 }
