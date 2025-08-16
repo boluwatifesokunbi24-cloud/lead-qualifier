@@ -697,6 +697,13 @@ export default function Home() {
         onClose={() => setSurveyModalOpen(false)}
         onExport={handleExportWithSurvey}
         exportButtonText={exportType === 'filtered' ? `Export Filtered (${filteredLeads.length})` : "Export All Results"}
+        exportInfo={processingStats ? {
+          exportType,
+          leadsCount: exportType === 'filtered' ? filteredLeads.length : processedLeads.length,
+          totalLeads: processingStats.totalLeads,
+          qualifiedLeads: processingStats.qualifiedLeads,
+          qualificationRate: processingStats.qualificationRate
+        } : undefined}
       />
     </div>
   );

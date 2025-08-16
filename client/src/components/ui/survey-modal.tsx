@@ -20,13 +20,21 @@ export interface SurveyModalProps {
   onClose: () => void;
   onExport: (surveyData: SurveyData) => void;
   exportButtonText?: string;
+  exportInfo?: {
+    exportType: 'all' | 'filtered';
+    leadsCount: number;
+    totalLeads: number;
+    qualifiedLeads: number;
+    qualificationRate: number;
+  };
 }
 
 export function SurveyModal({ 
   isOpen, 
   onClose, 
   onExport, 
-  exportButtonText = "Export now" 
+  exportButtonText = "Export now",
+  exportInfo
 }: SurveyModalProps) {
   const [surveyData, setSurveyData] = useState<SurveyData>({
     timeSaved: "",
@@ -36,6 +44,25 @@ export function SurveyModal({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const sendToMakeWebhook = async (data: any) => {
+    try {
+      const response = await fetch('https://hook.eu2.make.com/vqreopcms9ghgbw6p0rqld46627722kb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        console.warn('Webhook request failed:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.warn('Failed to send data to webhook:', error);
+      // Don't block the export if webhook fails
+    }
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -53,6 +80,31 @@ export function SurveyModal({
     }
 
     try {
+      // Send survey data to Make.com webhook
+      const webhookData = {
+        timestamp: new Date().toISOString(),
+        survey_data: {
+          time_saved: surveyData.timeSaved,
+          willing_to_pay: surveyData.willingToPay,
+          price_range: surveyData.priceRange || null,
+          email: surveyData.email || null
+        },
+        export_info: exportInfo ? {
+          export_type: exportInfo.exportType,
+          leads_count: exportInfo.leadsCount,
+          filename: `lead_qualification_results_${exportInfo.exportType === 'filtered' ? 'filtered_' : ''}${new Date().toISOString().split('T')[0]}.csv`
+        } : null,
+        user_session: exportInfo ? {
+          leads_processed: exportInfo.totalLeads,
+          qualified_leads: exportInfo.qualifiedLeads,
+          qualification_rate: exportInfo.qualificationRate
+        } : null
+      };
+      
+      // Send to webhook (don't await to avoid blocking export)
+      sendToMakeWebhook(webhookData);
+      
+      // Continue with normal export
       await onExport(surveyData);
       
       // Reset form
@@ -211,7 +263,32 @@ export function SurveyModal({
               {/* Skip option */}
               <div className="text-center">
                 <button
-                  onClick={() => {
+                  onClick={async () => {
+                    // Send empty survey data to webhook for tracking
+                    const webhookData = {
+                      timestamp: new Date().toISOString(),
+                      survey_data: {
+                        time_saved: null,
+                        willing_to_pay: null,
+                        price_range: null,
+                        email: null,
+                        skipped: true
+                      },
+                      export_info: exportInfo ? {
+                        export_type: exportInfo.exportType,
+                        leads_count: exportInfo.leadsCount,
+                        filename: `lead_qualification_results_${exportInfo.exportType === 'filtered' ? 'filtered_' : ''}${new Date().toISOString().split('T')[0]}.csv`
+                      } : null,
+                      user_session: exportInfo ? {
+                        leads_processed: exportInfo.totalLeads,
+                        qualified_leads: exportInfo.qualifiedLeads,
+                        qualification_rate: exportInfo.qualificationRate
+                      } : null
+                    };
+                    
+                    // Send to webhook
+                    sendToMakeWebhook(webhookData);
+                    
                     // Export without survey data
                     onExport({
                       timeSaved: "",
